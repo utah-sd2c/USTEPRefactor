@@ -1,5 +1,5 @@
 //
-// This source file is part of the USTEP based on the Stanford Spezi Template Application project
+// This source file is part of the U-STEP based on the Stanford Spezi Template Application project
 //
 // SPDX-FileCopyrightText: 2023 Stanford University
 //
@@ -57,38 +57,38 @@ final class FirebaseConfiguration: Module, DefaultInitializable, @unchecked Send
 
     func configure() {
         Task {
-            await setupTestAccount()
+            // await setupTestAccount()
         }
     }
 
 
     private func setupTestAccount() async {
-        guard let accountService, FeatureFlags.setupTestAccount else {
-            return
-        }
-
-        do {
-            try await accountService.login(userId: "lelandstanford@stanford.edu", password: "StanfordRocks!")
-            return
-        } catch {
-            guard let accountError = error as? FirebaseAccountError,
-                  case .invalidCredentials = accountError else {
-                logger.error("Failed to login into test account: \(error)")
-                return
-            }
-        }
-
-        // account doesn't exist yet, signup
-        var details = AccountDetails()
-        details.userId = "lelandstanford@stanford.edu"
-        details.password = "StanfordRocks!"
-        details.name = PersonNameComponents(givenName: "Leland", familyName: "Stanford")
-        details.genderIdentity = .male
-
-        do {
-            try await accountService.signUp(with: details)
-        } catch {
-            logger.error("Failed to setup test account: \(error)")
-        }
+//        guard let accountService, FeatureFlags.setupTestAccount else {
+//            return
+//        }
+//
+//        do {
+//            try await accountService.login(userId: "lelandstanford@stanford.edu", password: "StanfordRocks!")
+//            return
+//        } catch {
+//            guard let accountError = error as? FirebaseAccountError,
+//                  case .invalidCredentials = accountError else {
+//                logger.error("Failed to login into test account: \(error)")
+//                return
+//            }
+//        }
+//
+//        // account doesn't exist yet, signup
+//        var details = AccountDetails()
+//        details.userId = "lelandstanford@stanford.edu"
+//        details.password = "StanfordRocks!"
+//        details.name = PersonNameComponents(givenName: "Leland", familyName: "Stanford")
+//        details.genderIdentity = .male
+//
+//        do {
+//            try await accountService.signUp(with: details)
+//        } catch {
+//            logger.error("Failed to setup test account: \(error)")
+//        }
     }
 }
