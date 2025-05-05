@@ -30,11 +30,11 @@ class USTEPDelegate: SpeziAppDelegate {
                     storageProvider: FirestoreAccountStorage(storeIn: FirebaseConfiguration.userCollection),
                     configuration: [
                         .requires(\.userId),
-                        .requires(\.name),
+                        .requires(\.name)
 
                         // additional values stored using the `FirestoreAccountStorage` within our Standard implementation
-                        .collects(\.genderIdentity),
-                        .collects(\.dateOfBirth)
+                        // .collects(\.genderIdentity),
+                        // .collects(\.dateOfBirth)
                     ]
                 )
 
