@@ -26,7 +26,7 @@ class USTEPDelegate: SpeziAppDelegate {
         Configuration(standard: USTEPStandard()) {
             if !FeatureFlags.disableFirebase {
                 AccountConfiguration(
-                    service: FirebaseAccountService(providers: [.emailAndPassword, .signInWithApple], emulatorSettings: accountEmulator),
+                    service: FirebaseAccountService(providers: [.emailAndPassword], emulatorSettings: accountEmulator),
                     storageProvider: FirestoreAccountStorage(storeIn: FirebaseConfiguration.userCollection),
                     configuration: [
                         .requires(\.userId),
@@ -81,8 +81,8 @@ class USTEPDelegate: SpeziAppDelegate {
     
     private var healthKit: HealthKit {
         HealthKit {
-            CollectSample(.stepCount)
-            CollectSample(.heartRate)
+            //CollectSample(.stepCount)
+            //CollectSample(.heartRate)
         }
     }
 }

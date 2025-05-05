@@ -40,8 +40,8 @@ actor USTEPStandard: Standard,
         }
         
         do {
-            try await healthKitDocument(id: sample.id)
-                .setData(from: sample.resource)
+            //try await healthKitDocument(id: sample.id)
+            //    .setData(from: sample.resource)
         } catch {
             logger.error("Could not store HealthKit sample: \(error)")
         }
@@ -54,7 +54,7 @@ actor USTEPStandard: Standard,
         }
         
         do {
-            try await healthKitDocument(id: sample.uuid).delete()
+            //try await healthKitDocument(id: sample.uuid).delete()
         } catch {
             logger.error("Could not remove HealthKit sample: \(error)")
         }
@@ -71,10 +71,10 @@ actor USTEPStandard: Standard,
         }
         
         do {
-            try await configuration.userDocumentReference
-                .collection("QuestionnaireResponse") // Add all HealthKit sources in a /QuestionnaireResponse collection.
-                .document(id) // Set the document identifier to the id of the response.
-                .setData(from: response)
+            //try await configuration.userDocumentReference
+            //    .collection("QuestionnaireResponse") // Add all HealthKit sources in a /QuestionnaireResponse collection.
+            //    .document(id) // Set the document identifier to the id of the response.
+            //    .setData(from: response)
         } catch {
             await logger.error("Could not store questionnaire response: \(error)")
         }
@@ -90,7 +90,7 @@ actor USTEPStandard: Standard,
     func respondToEvent(_ event: AccountNotifications.Event) async {
         if case let .deletingAccount(accountId) = event {
             do {
-                try await configuration.userDocumentReference(for: accountId).delete()
+                //try await configuration.userDocumentReference(for: accountId).delete()
             } catch {
                 logger.error("Could not delete user document: \(error)")
             }
@@ -126,9 +126,9 @@ actor USTEPStandard: Standard,
 
             let metadata = StorageMetadata()
             metadata.contentType = "application/pdf"
-            _ = try await configuration.userBucketReference
-                .child("consent/\(dateString).pdf")
-                .putDataAsync(consentData, metadata: metadata) { @Sendable _ in }
+            //_ = try await configuration.userBucketReference
+            //    .child("consent/\(dateString).pdf")
+            //    .putDataAsync(consentData, metadata: metadata) { @Sendable _ in }
         } catch {
             await logger.error("Could not store consent form: \(error)")
         }
