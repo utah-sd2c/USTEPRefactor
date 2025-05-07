@@ -81,8 +81,8 @@ class USTEPDelegate: SpeziAppDelegate {
     
     private var healthKit: HealthKit {
         HealthKit {
-            //CollectSample(.stepCount)
-            //CollectSample(.heartRate)
+            // CollectSample(.stepCount)
+            // CollectSample(.heartRate)
         }
     }
 }
