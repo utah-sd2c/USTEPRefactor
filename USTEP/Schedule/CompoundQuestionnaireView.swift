@@ -21,13 +21,13 @@ import SwiftUI
 public struct CompoundQuestionnaireView: View {
     private static let logger = Logger(subsystem: "edu.stanford.spezi.questionnaire", category: "CompoundQuestionnaireView")
 
-    private let compoundElements: CompoundQuestionnaireElement
+    private let compoundQuestionnaire: CompoundQuestionnaire?
     private let questionnaireResult: @MainActor (QuestionnaireResult) async -> Void
     private let cancelBehavior: CancelBehavior
     
     
     public var body: some View {
-        if let task = createTask(compoundElements: compoundElements) {
+        if let task = createTask(compoundQuestionnaire: compoundQuestionnaire) {
             ORKOrderedTaskView(tasks: task, tintColor: .accentColor, cancelBehavior: cancelBehavior, result: handleResult)
                 .ignoresSafeArea(.container, edges: .bottom)
                 .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -43,11 +43,11 @@ public struct CompoundQuestionnaireView: View {
     ///   - cancelBehavior: The cancel behavior of view. The default setting allows cancellation and asks for confirmation before the view is dismissed.
     ///   - questionnaireResult: Result closure that processes the ``QuestionnaireResult``.
     public init(
-        compoundElements: CompoundQuestionnaireElement,
+        compoundQuestionnaire: CompoundQuestionnaire?,
         cancelBehavior: CancelBehavior = .shouldConfirmCancel,
         questionnaireResult: @escaping @MainActor (QuestionnaireResult) async -> Void
     ) {
-        self.compoundElements = compoundElements
+        self.compoundQuestionnaire = compoundQuestionnaire
         self.cancelBehavior = cancelBehavior
         self.questionnaireResult = questionnaireResult
     }
@@ -65,12 +65,13 @@ public struct CompoundQuestionnaireView: View {
         var compStep: ORKStep
         compStep = ORKCompletionStep(identifier: "Completion step")
         compStep.text = "Completion step"
-        stepsToInsert.updateValue([compStep], forKey: Questionnaire.dateTimeExample.item?.count ?? 0)
+        stepsToInsert.updateValue([compStep], forKey: -1) // -1 index forces the end of the array later on
+        let compQuestionnaire = CompoundQuestionnaire(
+            questionnaire: Questionnaire.dateTimeExample,
+            stepsToInsert: stepsToInsert
+        )
         return CompoundQuestionnaireView(
-            compoundElements: CompoundQuestionnaireElement(
-                questionnaire: .dateTimeExample,
-                stepsToInsert: stepsToInsert
-            )
+            compoundQuestionnaire: compQuestionnaire
         ) { response in
             print("Received response \(response)")
         }
@@ -95,23 +96,31 @@ public struct CompoundQuestionnaireView: View {
     /// Creates a ResearchKit navigable task from a questionnaire
     /// - Parameter compoundElements: a questionnaire and optional list of steps to add
     /// - Returns: a ResearchKit navigable task
-    private func createTask(compoundElements: CompoundQuestionnaireElement) -> ORKNavigableOrderedTask? {
+    private func createTask(compoundQuestionnaire: CompoundQuestionnaire?) -> ORKNavigableOrderedTask? {
         // Create a navigable task from the Questionnaire and other steps
         do {
-            var task: ORKNavigableOrderedTask = try ORKNavigableOrderedTask(questionnaire: compoundElements.questionnaire)
-            // Insert additional steps into the Questionnaire
-            if !compoundElements.stepsToInsert.keys.isEmpty {
-                var keys = Array(compoundElements.stepsToInsert.keys).sorted(by: >)
-                for key in keys {
-                    var steps: [ORKStep] = compoundElements.stepsToInsert[key] ?? []
-                    var len = steps.count
-                    for ind in 0 ..< len {
-                        var step: ORKStep = steps[ind]
-                        task.insertStep(step, at: UInt(key + ind))
+            if let compQuestionnaire: CompoundQuestionnaire = compoundQuestionnaire {
+                let task: ORKNavigableOrderedTask = try ORKNavigableOrderedTask(questionnaire: compQuestionnaire)
+                // Insert additional steps into the Questionnaire
+                let stepsToInsert = compQuestionnaire.stepsToInsert
+                if !stepsToInsert.keys.isEmpty {
+                    let keys = Array(stepsToInsert.keys).sorted(by: >)
+                    for key in keys {
+                        var questionnaireIndex = key
+                        if key < 0 || key > compQuestionnaire.item?.count ?? 0 {
+                            questionnaireIndex = compQuestionnaire.item?.count ?? 0
+                        }
+                        let steps: [ORKStep] = stepsToInsert[questionnaireIndex] ?? []
+                        let len = steps.count
+                        for ind in 0 ..< len {
+                            let step: ORKStep = steps[ind]
+                            task.insertStep(step, at: UInt(key + ind))
+                        }
                     }
                 }
+                return task
             }
-            return task
+            return nil
         } catch {
             Self.logger.error("Failed to create ORK task: \(error)")
             return nil

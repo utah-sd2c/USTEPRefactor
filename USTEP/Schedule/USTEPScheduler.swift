@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ResearchKit
 import Spezi
 import SpeziScheduler
 import SpeziViews
@@ -32,7 +33,25 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 category: .questionnaire,
                 schedule: .daily(hour: 8, minute: 0, startingAt: .today)
             ) { context in
-                context.questionnaire = Bundle.main.questionnaire(withName: "SocialSupportQuestionnaire")
+                var stepsToInsert: [Int: [ORKStep]] = [:]
+                var step0: ORKStep
+                step0 = ORKInstructionStep(identifier: "First step")
+                step0.text = "First step"
+                var step1: ORKStep
+                step1 = ORKInstructionStep(identifier: "Second step")
+                step1.text = "Second step"
+                stepsToInsert.updateValue([step0, step1], forKey: 1)
+                var compStep: ORKStep
+                compStep = ORKCompletionStep(identifier: "Completion step")
+                compStep.text = "Completion step"
+                stepsToInsert.updateValue([compStep], forKey: -1)
+                let compQuestionnaire = CompoundQuestionnaire(
+                    questionnaire: Bundle.main.questionnaire(
+                        withName: "SocialSupportQuestionnaire"
+                    ),
+                    stepsToInsert: stepsToInsert
+                )
+                context.compoundQuestionnaire = compQuestionnaire
             }
         } catch {
             viewState = .error(AnyLocalizedError(error: error, defaultErrorDescription: "Failed to create or update scheduled tasks."))
@@ -42,7 +61,7 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
 
 
 extension Task.Context {
-    @Property(coding: .json) var questionnaire: Questionnaire?
+    @Property(coding: .json) var compoundQuestionnaire: CompoundQuestionnaire?
 }
 
 

@@ -18,8 +18,8 @@ struct EventView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        if let questionnaire = event.task.questionnaire {
-            QuestionnaireView(questionnaire: questionnaire) { result in
+        if let compoundQuestionnaire = event.task.compoundQuestionnaire {
+            CompoundQuestionnaireView(compoundQuestionnaire: compoundQuestionnaire) { result in
                 dismiss()
 
                 guard case let .completed(response) = result else {
