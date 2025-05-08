@@ -16,33 +16,13 @@ import SpeziQuestionnaire
 import SwiftUI
 
 
-/// Present a FHIR `Questionnaire` to the user.
-///
-/// The following example shows how to present a questionnaire:
-/// ```swift
-/// struct ExampleQuestionnaireView: View {
-///     @State var displayQuestionnaire = false
-///
-///
-///     var body: some View {
-///         Button("Display Questionnaire") {
-///             displayQuestionnaire.toggle()
-///         }
-///             .sheet(isPresented: $displayQuestionnaire) {
-///                 QuestionnaireView(
-///                     questionnaire: Questionnaire.gcs,
-///                     isPresented: $displayQuestionnaire
-///                 )
-///             }
-///     }
-/// }
-/// ```
+/// Present a FHIR `Questionnaire` and additional steps  to the user.
+/// See the makeTestView function for an example of how to use this struct
 public struct CompoundQuestionnaireView: View {
-    private static let logger = Logger(subsystem: "edu.stanford.spezi.questionnaire", category: "QuestionnaireView")
+    private static let logger = Logger(subsystem: "edu.stanford.spezi.questionnaire", category: "CompoundQuestionnaireView")
 
     private let compoundElements: CompoundQuestionnaireElement
     private let questionnaireResult: @MainActor (QuestionnaireResult) async -> Void
-    private let completionStepMessage: String?
     private let cancelBehavior: CancelBehavior
     
     
@@ -59,23 +39,43 @@ public struct CompoundQuestionnaireView: View {
     
     
     /// - Parameters:
-    ///   - questionnaire: The  `Questionnaire` that should be displayed.
-    ///   - completionStepMessage: Optional completion message that can be appended at the end of the questionnaire.
+    ///   - compoundElements: The questionnaire and additional steps to display
     ///   - cancelBehavior: The cancel behavior of view. The default setting allows cancellation and asks for confirmation before the view is dismissed.
     ///   - questionnaireResult: Result closure that processes the ``QuestionnaireResult``.
     public init(
-        // questionnaire: Questionnaire,
         compoundElements: CompoundQuestionnaireElement,
-        completionStepMessage: String? = nil,
         cancelBehavior: CancelBehavior = .shouldConfirmCancel,
         questionnaireResult: @escaping @MainActor (QuestionnaireResult) async -> Void
     ) {
         self.compoundElements = compoundElements
-        self.completionStepMessage = completionStepMessage
         self.cancelBehavior = cancelBehavior
         self.questionnaireResult = questionnaireResult
     }
     
+#if DEBUG
+    public static func makeTestView() -> CompoundQuestionnaireView {
+        var stepsToInsert: [Int: [ORKStep]] = [:]
+        var step0: ORKStep
+        step0 = ORKInstructionStep(identifier: "First step")
+        step0.text = "First step"
+        var step1: ORKStep
+        step1 = ORKInstructionStep(identifier: "Second step")
+        step1.text = "Second step"
+        stepsToInsert.updateValue([step0, step1], forKey: 1)
+        var compStep: ORKStep
+        compStep = ORKCompletionStep(identifier: "Completion step")
+        compStep.text = "Completion step"
+        stepsToInsert.updateValue([compStep], forKey: Questionnaire.dateTimeExample.item?.count ?? 0)
+        return CompoundQuestionnaireView(
+            compoundElements: CompoundQuestionnaireElement(
+                questionnaire: .dateTimeExample,
+                stepsToInsert: stepsToInsert
+            )
+        ) { response in
+            print("Received response \(response)")
+        }
+    }
+#endif
     
     private func handleResult(_ result: TaskResult) async {
         let questionnaireResult: QuestionnaireResult
@@ -93,20 +93,13 @@ public struct CompoundQuestionnaireView: View {
 
     
     /// Creates a ResearchKit navigable task from a questionnaire
-    /// - Parameter questionnaire: a questionnaire
+    /// - Parameter compoundElements: a questionnaire and optional list of steps to add
     /// - Returns: a ResearchKit navigable task
     private func createTask(compoundElements: CompoundQuestionnaireElement) -> ORKNavigableOrderedTask? {
-        // Create a completion step to add to the end of the Questionnaire (optional)
-        var completionStep: ORKCompletionStep?
-        if let completionStepMessage {
-            completionStep = ORKCompletionStep(identifier: "completion-step")
-            completionStep?.text = completionStepMessage
-        }
-        
-        // Create a navigable task from the Questionnaire
+        // Create a navigable task from the Questionnaire and other steps
         do {
             var task: ORKNavigableOrderedTask = try ORKNavigableOrderedTask(questionnaire: compoundElements.questionnaire)
-            
+            // Insert additional steps into the Questionnaire
             if !compoundElements.stepsToInsert.keys.isEmpty {
                 var keys = Array(compoundElements.stepsToInsert.keys).sorted(by: >)
                 for key in keys {
@@ -119,7 +112,6 @@ public struct CompoundQuestionnaireView: View {
                 }
             }
             return task
-            // return try ORKNavigableOrderedTask(questionnaire: questionnaire).addSteps(from: ORKNavigableOrderedTask(questionnaire: questionnaire, completionStep: completionStep).steps)
         } catch {
             Self.logger.error("Failed to create ORK task: \(error)")
             return nil
@@ -130,21 +122,6 @@ public struct CompoundQuestionnaireView: View {
 
 #if DEBUG
 #Preview {
-    var stepsToInsert: [Int: [ORKStep]] = [:]
-    var step0: ORKStep
-    step0 = ORKInstructionStep(identifier: "First step")
-    step0.text = "First step"
-    var step1: ORKStep
-    step1 = ORKInstructionStep(identifier: "Second step")
-    step1.text = "Second step"
-    stepsToInsert.updateValue([step0, step1], forKey: 1)
-    return CompoundQuestionnaireView(
-        compoundElements: CompoundQuestionnaireElement(
-            questionnaire: .dateTimeExample,
-            stepsToInsert: stepsToInsert
-        )
-    ) { response in
-        print("Received response \(response)")
-    }
+    CompoundQuestionnaireView.makeTestView()
 }
 #endif
