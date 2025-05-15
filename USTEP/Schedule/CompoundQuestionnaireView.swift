@@ -54,18 +54,32 @@ public struct CompoundQuestionnaireView: View {
     
 #if DEBUG
     public static func makeTestView() -> CompoundQuestionnaireView {
-        var stepsToInsert: [Int: [ORKStep]] = [:]
-        var step0: ORKStep
-        step0 = ORKInstructionStep(identifier: "First step")
-        step0.text = "First step"
-        var step1: ORKStep
-        step1 = ORKInstructionStep(identifier: "Second step")
-        step1.text = "Second step"
-        stepsToInsert.updateValue([step0, step1], forKey: 1)
-        var compStep: ORKStep
-        compStep = ORKCompletionStep(identifier: "Completion step")
-        compStep.text = "Completion step"
-        stepsToInsert.updateValue([compStep], forKey: -1) // -1 index forces the end of the array later on
+        var stepsToInsert: [Int: CodableORKSteps] = [:]
+        var step0: CodableORKStep = .init(
+            stepType: .getUpAndGo,
+            id: "First step",
+            title: "First step",
+            text: "First step"
+        )
+        var step1: CodableORKStep = .init(
+            stepType: .sixMWT,
+            id: "Second step",
+            title: "Second step",
+            text: "Second step"
+        )
+        var firstSet: CodableORKSteps = .init()
+        firstSet.codableORKSteps.append(step0)
+        firstSet.codableORKSteps.append(step1)
+        stepsToInsert.updateValue(firstSet, forKey: 1)
+        var compStep: CodableORKStep = .init(
+            stepType: .completion,
+            id: "Completion step",
+            title: "Completion step",
+            text: "Completion step"
+        )
+        var secondSet: CodableORKSteps = .init()
+        secondSet.codableORKSteps.append(compStep)
+        stepsToInsert.updateValue(secondSet, forKey: -1) // -1 index forces the end of the array later on
         let compQuestionnaire = CompoundQuestionnaire(
             questionnaire: Questionnaire.dateTimeExample,
             stepsToInsert: stepsToInsert
@@ -110,10 +124,10 @@ public struct CompoundQuestionnaireView: View {
                         if key < 0 || key > compQuestionnaire.item?.count ?? 0 {
                             questionnaireIndex = compQuestionnaire.item?.count ?? 0
                         }
-                        let steps: [ORKStep] = stepsToInsert[questionnaireIndex] ?? []
-                        let len = steps.count
+                        let steps: CodableORKSteps = stepsToInsert[questionnaireIndex] ?? .init()
+                        let len = steps.codableORKSteps.count
                         for ind in 0 ..< len {
-                            let step: ORKStep = steps[ind]
+                            let step: ORKStep = CodableORKStep.createORKStep(codableORKStep: steps.codableORKSteps[ind])
                             task.insertStep(step, at: UInt(key + ind))
                         }
                     }

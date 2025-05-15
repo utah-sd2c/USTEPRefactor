@@ -9,10 +9,56 @@
 import ResearchKit
 import SpeziQuestionnaire
 
-public class CompoundQuestionnaire: Questionnaire {
-    public var stepsToInsert: [Int: [ORKStep]] = [:]
+public enum CodableORKStepType: String, Codable {
+    case getUpAndGo, sixMWT, completion
+}
+
+public class CodableORKStep: Codable {
+    public var stepType: CodableORKStepType
+    public var id: String
+    public var title: String
+    public var text: String
     
-    public init(questionnaire: Questionnaire, stepsToInsert: [Int: [ORKStep]]) {
+    public init(stepType: CodableORKStepType, id: String, title: String, text: String) {
+        self.stepType = stepType
+        self.id = id
+        self.title = title
+        self.text = text
+    }
+    
+    public static func createORKStep(codableORKStep: CodableORKStep) -> ORKStep {
+        switch codableORKStep.stepType {
+        case .getUpAndGo:
+            var activeStep: ORKActiveStep = ORKActiveStep(identifier: codableORKStep.id)
+            activeStep.title = codableORKStep.title
+            activeStep.text = codableORKStep.text
+            return activeStep
+        case .sixMWT:
+            var activeStep: ORKActiveStep = ORKActiveStep(identifier: codableORKStep.id)
+            activeStep.title = codableORKStep.title
+            activeStep.text = codableORKStep.text
+            return activeStep
+        case .completion:
+            var completionStep: ORKCompletionStep = ORKCompletionStep(identifier: codableORKStep.id)
+            completionStep.title = codableORKStep.title
+            completionStep.text = codableORKStep.text
+            return completionStep
+        }
+    }
+}
+
+public struct CodableORKSteps: Codable {
+    public var codableORKSteps: [CodableORKStep]
+    
+    public init() {
+        codableORKSteps = []
+    }
+}
+
+public class CompoundQuestionnaire: Questionnaire {
+    public var stepsToInsert: [Int: CodableORKSteps]
+    
+    public init(questionnaire: Questionnaire, stepsToInsert: [Int: CodableORKSteps]) {
         self.stepsToInsert = stepsToInsert
         super.init(status: questionnaire.status)
         self.approvalDate = questionnaire.approvalDate
@@ -48,7 +94,12 @@ public class CompoundQuestionnaire: Questionnaire {
     }
     
     public required init(from decoder: any Decoder) throws {
-        // self.stepsToInsert = [:]
+        let container = try decoder.container(keyedBy: CodingKeysForCompoundQuestionnaire.self)
+        self.stepsToInsert = try container.decode([Int: CodableORKSteps].self, forKey: .stepsToInsert)
         try super.init(from: decoder)
+    }
+    
+    enum CodingKeysForCompoundQuestionnaire: String, CodingKey {
+        case stepsToInsert
     }
 }
