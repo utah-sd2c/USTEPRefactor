@@ -54,7 +54,7 @@ public struct CompoundQuestionnaireView: View {
     
 #if DEBUG
     public static func makeTestView() -> CompoundQuestionnaireView {
-        var stepsToInsert: [Int: CodableORKSteps] = [:]
+        var stepsToInsert: CodableORKStepsDict = .init()
         var step0: CodableORKStep = .init(
             stepType: .getUpAndGo,
             id: "First step",
@@ -70,7 +70,7 @@ public struct CompoundQuestionnaireView: View {
         var firstSet: CodableORKSteps = .init()
         firstSet.codableORKSteps.append(step0)
         firstSet.codableORKSteps.append(step1)
-        stepsToInsert.updateValue(firstSet, forKey: 1)
+        stepsToInsert.dict.updateValue(firstSet, forKey: 1)
         var compStep: CodableORKStep = .init(
             stepType: .completion,
             id: "Completion step",
@@ -79,7 +79,7 @@ public struct CompoundQuestionnaireView: View {
         )
         var secondSet: CodableORKSteps = .init()
         secondSet.codableORKSteps.append(compStep)
-        stepsToInsert.updateValue(secondSet, forKey: -1) // -1 index forces the end of the array later on
+        stepsToInsert.dict.updateValue(secondSet, forKey: Int.max) // Int.max will indicate the end of the array later on
         let compQuestionnaire = CompoundQuestionnaire(
             questionnaire: Questionnaire.dateTimeExample,
             stepsToInsert: stepsToInsert
@@ -114,21 +114,21 @@ public struct CompoundQuestionnaireView: View {
         // Create a navigable task from the Questionnaire and other steps
         do {
             if let compQuestionnaire: CompoundQuestionnaire = compoundQuestionnaire {
-                let task: ORKNavigableOrderedTask = try ORKNavigableOrderedTask(questionnaire: compQuestionnaire)
+                let task: ORKNavigableOrderedTask = try ORKNavigableOrderedTask(questionnaire: compQuestionnaire.questionnaire)
                 // Insert additional steps into the Questionnaire
                 let stepsToInsert = compQuestionnaire.stepsToInsert
-                if !stepsToInsert.keys.isEmpty {
-                    let keys = Array(stepsToInsert.keys).sorted(by: >)
+                if !stepsToInsert.dict.keys.isEmpty {
+                    let keys = Array(stepsToInsert.dict.keys).sorted(by: >)
                     for key in keys {
-                        var questionnaireIndex = key
-                        if key < 0 || key > compQuestionnaire.item?.count ?? 0 {
-                            questionnaireIndex = compQuestionnaire.item?.count ?? 0
-                        }
-                        let steps: CodableORKSteps = stepsToInsert[questionnaireIndex] ?? .init()
+                        let steps: CodableORKSteps = stepsToInsert.dict[key] ?? .init()
                         let len = steps.codableORKSteps.count
                         for ind in 0 ..< len {
                             let step: ORKStep = CodableORKStep.createORKStep(codableORKStep: steps.codableORKSteps[ind])
-                            task.insertStep(step, at: UInt(key + ind))
+                            var finalIndex: Int = ind + key
+                            if finalIndex > task.steps.count {
+                                finalIndex = task.steps.count
+                            }
+                            task.insertStep(step, at: UInt(finalIndex))
                         }
                     }
                 }

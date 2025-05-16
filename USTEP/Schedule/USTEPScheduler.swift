@@ -33,7 +33,7 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 category: .questionnaire,
                 schedule: .daily(hour: 8, minute: 0, startingAt: .today)
             ) { context in
-                var stepsToInsert: [Int: CodableORKSteps] = [:]
+                var stepsToInsert: CodableORKStepsDict = .init()
                 var step0: CodableORKStep = .init(
                     stepType: .getUpAndGo,
                     id: "First step",
@@ -49,7 +49,7 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 var firstSet: CodableORKSteps = .init()
                 firstSet.codableORKSteps.append(step0)
                 firstSet.codableORKSteps.append(step1)
-                stepsToInsert.updateValue(firstSet, forKey: 1)
+                stepsToInsert.dict.updateValue(firstSet, forKey: 1)
                 var compStep: CodableORKStep = .init(
                     stepType: .completion,
                     id: "Completion step",
@@ -58,7 +58,7 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 )
                 var secondSet: CodableORKSteps = .init()
                 secondSet.codableORKSteps.append(compStep)
-                stepsToInsert.updateValue(secondSet, forKey: -1) // -1 index forces the end of the array later on
+                stepsToInsert.dict.updateValue(secondSet, forKey: Int.max) // Int.max index forces the end of the array later on
                 let compQuestionnaire = CompoundQuestionnaire(
                     questionnaire: Bundle.main.questionnaire(
                         withName: "SocialSupportQuestionnaire"
