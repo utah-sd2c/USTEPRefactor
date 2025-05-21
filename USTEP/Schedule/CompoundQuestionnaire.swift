@@ -33,10 +33,10 @@ public class CodableORKStep: Codable, Equatable {
     public static func createORKStep(codableORKStep: CodableORKStep) -> ORKStep {
         switch codableORKStep.stepType {
         case .getUpAndGo:
-            let activeStep = ORKActiveStep(identifier: codableORKStep.id)
-            activeStep.title = codableORKStep.title
-            activeStep.text = codableORKStep.text
-            return activeStep
+            let getUpAndGoStep = GetUpAndGoStep(identifier: codableORKStep.id)
+            getUpAndGoStep.title = codableORKStep.title
+            getUpAndGoStep.text = codableORKStep.text
+            return getUpAndGoStep
         case .sixMWT:
             let activeStep = ORKActiveStep(identifier: codableORKStep.id)
             activeStep.title = codableORKStep.title
