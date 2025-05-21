@@ -26,10 +26,10 @@ public class GetUpAndGoStep: ORKActiveStep {
         true
     }
     
-    /// This is deprecated and needs to be replaced
-    override class func stepViewControllerClass() -> AnyClass {
-        return GetUpAndGoViewController.self
-    }
+    // /// This is deprecated and needs to be replaced
+    // override class func stepViewControllerClass() -> AnyClass {
+    //    return GetUpAndGoViewController.self
+    // }
     
     override public func validateParameters() {
         super.validateParameters()
