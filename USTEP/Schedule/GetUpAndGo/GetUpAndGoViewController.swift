@@ -56,7 +56,7 @@ class GetUpAndGoViewController: ORKActiveStepViewController {
     
     @objc
     func showUserAnswers(time: Double) {
-        visionStepView.question.text = "You took about " + String(time.rounded()) + " seconds to complete that task. Does this seem right? Choose the best category you feel is most appropriate."
+        visionStepView.question.text = "You took about " + String(Int(time.rounded())) + " seconds to complete that task. Does this seem right? Choose the best category you feel is most appropriate."
         visionStepView.answerButton1.isHidden = false
         visionStepView.answerButton2.isHidden = false
         visionStepView.answerButton3.isHidden = false
@@ -86,11 +86,11 @@ class GetUpAndGoViewController: ORKActiveStepViewController {
         
         results = NSMutableArray()
 
-        // activeStepView?.customContentView = visionStepView
-        customView = visionStepView
-        // self.view!.addSubview(visionStepView)
-        // activeStepView?.customContentFillsAvailableSpace = true
+        activeStepView?.customContentView = visionStepView
+        activeStepView?.customContentFillsAvailableSpace = true
         
+        // /// These lines are needed INSTEAD OF THE ABOVE 2 if updating to newer ResearchKit versions
+        // self.view!.addSubview(visionStepView)
         // visionStepView.translatesAutoresizingMaskIntoConstraints = false
         // NSLayoutConstraint.activate([
         //     visionStepView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -103,6 +103,8 @@ class GetUpAndGoViewController: ORKActiveStepViewController {
         visionStepView.answerButton1.addTarget(self, action: #selector(answer1Chosen), for: .touchUpInside)
         visionStepView.answerButton2.addTarget(self, action: #selector(answer2Chosen), for: .touchUpInside)
         visionStepView.answerButton3.addTarget(self, action: #selector(answer3Chosen), for: .touchUpInside)
+        
+        customView = visionStepView
     }
     
     override public func viewDidAppear(_ animated: Bool) {
