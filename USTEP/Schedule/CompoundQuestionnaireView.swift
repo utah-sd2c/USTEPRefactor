@@ -81,7 +81,9 @@ public struct CompoundQuestionnaireView: View {
         secondSet.codableORKSteps.append(compStep)
         stepsToInsert.dict.updateValue(secondSet, forKey: Int.max) // Int.max will indicate the end of the array later on
         let compQuestionnaire = CompoundQuestionnaire(
-            questionnaire: Questionnaire.dateTimeExample,
+            questionnaire: Bundle.main.questionnaire(
+                withName: "SocialSupportQuestionnaire"
+            ),
             stepsToInsert: stepsToInsert
         )
         return CompoundQuestionnaireView(
