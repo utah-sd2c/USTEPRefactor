@@ -6,6 +6,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+// swiftlint:disable function_body_length
+// swiftlint:disable closure_body_length
 import Foundation
 import ResearchKit
 import Spezi
@@ -34,13 +36,24 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 schedule: .daily(hour: 8, minute: 0, startingAt: .today)
             ) { context in
                 var stepsToInsert: CodableORKStepsDict = .init()
-                var step0: CodableORKStep = .init(
-                    stepType: .getUpAndGo,
-                    id: "First step",
-                    title: "First step",
-                    text: "First step"
+                let step0: CodableORKStep = .init(
+                    stepType: .videoInstruction,
+                    id: "getUpAndGoInstruction",
+                    title: "Demonstration Above",
+                    text: """
+                    Click to Play
+                    
+                    When you're ready to start, click Get Started
+                    """,
+                    url: "https://firebasestorage.googleapis.com/v0/b/ustep-refactor.firebasestorage.app/o/video.mp4?alt=media&token=5cb96d28-1c8a-4b0b-9b1c-d69867856cf7"
                 )
-                var step1: CodableORKStep = .init(
+                let step1: CodableORKStep = .init(
+                    stepType: .getUpAndGo,
+                    id: "GetUpAndGo",
+                    title: "GetUpAndGo step",
+                    text: "GetUpAndGo step"
+                )
+                let step2: CodableORKStep = .init(
                     stepType: .sixMWT,
                     id: "Second step",
                     title: "Second step",
@@ -49,8 +62,9 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 var firstSet: CodableORKSteps = .init()
                 firstSet.codableORKSteps.append(step0)
                 firstSet.codableORKSteps.append(step1)
+                firstSet.codableORKSteps.append(step2)
                 stepsToInsert.dict.updateValue(firstSet, forKey: 1)
-                var compStep: CodableORKStep = .init(
+                let compStep: CodableORKStep = .init(
                     stepType: .completion,
                     id: "Completion step",
                     title: "Completion step",

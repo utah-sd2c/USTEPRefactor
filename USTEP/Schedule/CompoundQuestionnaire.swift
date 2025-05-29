@@ -10,28 +10,40 @@ import ResearchKit
 import SpeziQuestionnaire
 
 public enum CodableORKStepType: String, Codable {
-    case getUpAndGo, sixMWT, completion
+    case videoInstruction, getUpAndGo, sixMWT, completion
 }
 
 public class CodableORKStep: Codable, Equatable {
     public static func == (lhs: CodableORKStep, rhs: CodableORKStep) -> Bool {
-        return lhs.stepType == rhs.stepType && lhs.id == rhs.id && lhs.title == rhs.title && lhs.text == rhs.text
+        return lhs.stepType == rhs.stepType &&
+            lhs.id == rhs.id &&
+            lhs.title == rhs.title &&
+            lhs.text == rhs.text &&
+            lhs.url == rhs.url
     }
     
     public var stepType: CodableORKStepType
     public var id: String
     public var title: String
     public var text: String
+    public var url: String
     
-    public init(stepType: CodableORKStepType, id: String, title: String, text: String) {
+    public init(stepType: CodableORKStepType, id: String, title: String, text: String, url: String = "") {
         self.stepType = stepType
         self.id = id
         self.title = title
         self.text = text
+        self.url = url
     }
     
     public static func createORKStep(codableORKStep: CodableORKStep) -> ORKStep {
         switch codableORKStep.stepType {
+        case .videoInstruction:
+            let videoInstructionStep = ORKVideoInstructionStep(identifier: codableORKStep.id)
+            videoInstructionStep.title = codableORKStep.title
+            videoInstructionStep.text = codableORKStep.text
+            videoInstructionStep.videoURL = URL(string: codableORKStep.url)
+            return videoInstructionStep
         case .getUpAndGo:
             let getUpAndGoStep = GetUpAndGoStep(identifier: codableORKStep.id)
             getUpAndGoStep.title = codableORKStep.title
