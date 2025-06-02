@@ -117,6 +117,20 @@ public struct CompoundQuestionnaireView: View {
         do {
             if let compQuestionnaire: CompoundQuestionnaire = compoundQuestionnaire {
                 let task: ORKNavigableOrderedTask = try ORKNavigableOrderedTask(questionnaire: compQuestionnaire.questionnaire)
+                /// Override the titles of the questionnaire elements, given the optional override dictionary
+                var steps: [ORKStep] = [] // task.steps
+                for step in task.steps {
+                    var newStep: ORKStep = step
+                    newStep.title = (compQuestionnaire.titleOverrides.dict[step.identifier] ?? step.title)
+                    steps.append(newStep)
+                }
+                var newTask: ORKNavigableOrderedTask = .init(identifier: compQuestionnaire.questionnaire.identifier?.rawValue ?? "", steps: steps)
+                for (stepId, stepRule) in task.stepNavigationRules {
+                    newTask.setNavigationRule(stepRule, forTriggerStepIdentifier: stepId)
+                }
+                for (stepId, stepRule) in task.skipStepNavigationRules {
+                    newTask.setSkip(stepRule, forStepIdentifier: stepId)
+                }
                 // Insert additional steps into the Questionnaire
                 let stepsToInsert = compQuestionnaire.stepsToInsert
                 if !stepsToInsert.dict.keys.isEmpty {
@@ -127,14 +141,14 @@ public struct CompoundQuestionnaireView: View {
                         for ind in 0 ..< len {
                             let step: ORKStep = CodableORKStep.createORKStep(codableORKStep: steps.codableORKSteps[ind])
                             var finalIndex: Int = ind + key
-                            if finalIndex > task.steps.count {
-                                finalIndex = task.steps.count
+                            if finalIndex > newTask.steps.count {
+                                finalIndex = newTask.steps.count
                             }
-                            task.insertStep(step, at: UInt(finalIndex))
+                            newTask.insertStep(step, at: UInt(finalIndex))
                         }
                     }
                 }
-                return task
+                return newTask
             }
             return nil
         } catch {

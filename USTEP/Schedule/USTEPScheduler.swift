@@ -73,11 +73,49 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 var secondSet: CodableORKSteps = .init()
                 secondSet.codableORKSteps.append(compStep)
                 stepsToInsert.dict.updateValue(secondSet, forKey: Int.max) // Int.max index forces the end of the array later on
+                /// Set up the title overrides
+                var overrides: CodableTitleMapDict = .init()
+                overrides.dict.updateValue("Patient Questionnaire", forKey: "IntroStep")
+                overrides.dict.updateValue("Draw a clock", forKey: "ClockStep")
+                overrides.dict.updateValue("", forKey: "Edmonton 2")
+                overrides.dict.updateValue("", forKey: "Edmonton 3")
+                overrides.dict.updateValue("", forKey: "Edmonton 4")
+                overrides.dict.updateValue("", forKey: "Edmonton 5")
+                overrides.dict.updateValue("", forKey: "Edmonton 6")
+                overrides.dict.updateValue("", forKey: "Edmonton 7")
+                overrides.dict.updateValue("", forKey: "Edmonton 8")
+                overrides.dict.updateValue("", forKey: "Edmonton 9")
+                overrides.dict.updateValue("", forKey: "Edmonton 10")
+                overrides.dict.updateValue("Get Up and Go", forKey: "GetUpAndGoIntro")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 1")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 2")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 3")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 4")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 5")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 6")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 7")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 8")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 9")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 10")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 11")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 12")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 13")
+                overrides.dict.updateValue("How difficult was it for you to:", forKey: "WIQ 14")
+                overrides.dict.updateValue("", forKey: "VEINES 1")
+                overrides.dict.updateValue("", forKey: "VEINES 2")
+                overrides.dict.updateValue("", forKey: "VEINES 3")
+                overrides.dict.updateValue("", forKey: "VEINES 4")
+                overrides.dict.updateValue("", forKey: "VEINES 5")
+                overrides.dict.updateValue("", forKey: "VEINES 6")
+                overrides.dict.updateValue("", forKey: "VEINES 7")
+                overrides.dict.updateValue("", forKey: "VEINES 8")
+                
                 let compQuestionnaire = CompoundQuestionnaire(
                     questionnaire: Bundle.main.questionnaire(
-                        withName: "SocialSupportQuestionnaire"
+                        withName: "EdmontonWIQVeinesQuestionnaire-en-US"
                     ),
-                    stepsToInsert: stepsToInsert
+                    stepsToInsert: stepsToInsert,
+                    titleOverrides: overrides
                 )
                 context.compoundQuestionnaire = compQuestionnaire
             }

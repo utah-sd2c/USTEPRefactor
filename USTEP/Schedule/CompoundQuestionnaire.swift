@@ -87,27 +87,42 @@ public struct CodableORKStepsDict: Codable, Equatable {
     }
 }
 
+public struct CodableTitleMapDict: Codable, Equatable {
+    public static func == (lhs: CodableTitleMapDict, rhs: CodableTitleMapDict) -> Bool {
+        return lhs.dict == rhs.dict
+    }
+    
+    public var dict: [String: String]
+    
+    public init() {
+        dict = [:]
+    }
+}
+
 public class CompoundQuestionnaire: Codable, Equatable {
     enum CodingKeys: String, CodingKey {
-        case stepsToInsert, questionnaire
+        case stepsToInsert, questionnaire, titleOverrides
     }
     
     public var stepsToInsert: CodableORKStepsDict
     public var questionnaire: Questionnaire
+    public var titleOverrides: CodableTitleMapDict
     
     public required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.stepsToInsert = try container.decode(CodableORKStepsDict.self, forKey: .stepsToInsert)
         self.questionnaire = try container.decode(Questionnaire.self, forKey: .questionnaire)
+        self.titleOverrides = try container.decode(CodableTitleMapDict.self, forKey: .titleOverrides)
     }
     
-    public init(questionnaire: Questionnaire, stepsToInsert: CodableORKStepsDict) {
+    public init(questionnaire: Questionnaire, stepsToInsert: CodableORKStepsDict, titleOverrides: CodableTitleMapDict = CodableTitleMapDict()) {
         self.stepsToInsert = stepsToInsert
         self.questionnaire = questionnaire
+        self.titleOverrides = titleOverrides
     }
     
     public static func == (lhs: CompoundQuestionnaire, rhs: CompoundQuestionnaire) -> Bool {
-        return lhs.questionnaire == rhs.questionnaire && lhs.stepsToInsert == rhs.stepsToInsert
+        return lhs.questionnaire == rhs.questionnaire && lhs.stepsToInsert == rhs.stepsToInsert && lhs.titleOverrides == rhs.titleOverrides
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -115,5 +130,6 @@ public class CompoundQuestionnaire: Codable, Equatable {
         
         try container.encode(stepsToInsert, forKey: .stepsToInsert)
         try container.encode(questionnaire, forKey: .questionnaire)
+        try container.encode(titleOverrides, forKey: .titleOverrides)
     }
 }
