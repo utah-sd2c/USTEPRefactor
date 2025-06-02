@@ -49,21 +49,21 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 )
                 let step1: CodableORKStep = .init(
                     stepType: .getUpAndGo,
-                    id: "GetUpAndGo",
-                    title: "GetUpAndGo step",
-                    text: "GetUpAndGo step"
+                    id: "Edmonton 11",
+                    title: "",
+                    text: ""
                 )
-                let step2: CodableORKStep = .init(
-                    stepType: .sixMWT,
-                    id: "Second step",
-                    title: "Second step",
-                    text: "Second step"
-                )
+//                let step2: CodableORKStep = .init(
+//                    stepType: .sixMWT,
+//                    id: "Second step",
+//                    title: "Second step",
+//                    text: "Second step"
+//                )
                 var firstSet: CodableORKSteps = .init()
                 firstSet.codableORKSteps.append(step0)
                 firstSet.codableORKSteps.append(step1)
-                firstSet.codableORKSteps.append(step2)
-                stepsToInsert.dict.updateValue(firstSet, forKey: 1)
+                // firstSet.codableORKSteps.append(step2)
+                stepsToInsert.dict.updateValue(firstSet, forKey: 13)
                 let compStep: CodableORKStep = .init(
                     stepType: .completion,
                     id: "Completion step",
