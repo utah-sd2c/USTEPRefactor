@@ -194,8 +194,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				A9E1D3432C67A3F800CED217 /* PBXTargetDependency */,
-				56E7083D2BB06FCA00B08F0A /* PBXTargetDependency */,
+				D55832582DEF5F250049A7B4 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A973C0E42D7DC7C500BA148C /* USTEP */,
@@ -267,7 +266,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				A9E1D3482C67B0A700CED217 /* PBXTargetDependency */,
 				653A256928338800005D4D48 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -292,7 +290,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1340;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					653A254C283387FE005D4D48 = {
 						CreatedOnToolsVersion = 13.4;
@@ -399,10 +397,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		56E7083D2BB06FCA00B08F0A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 56E7083C2BB06FCA00B08F0A /* SwiftPackageListPlugin */;
-		};
 		653A255F28338800005D4D48 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 653A254C283387FE005D4D48 /* USTEP */;
@@ -413,17 +407,13 @@
 			target = 653A254C283387FE005D4D48 /* USTEP */;
 			targetProxy = 653A256828338800005D4D48 /* PBXContainerItemProxy */;
 		};
-		A9E1D3432C67A3F800CED217 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = A9E1D3422C67A3F800CED217 /* SwiftLintBuildToolPlugin */;
-		};
 		A9E1D3462C67B0A300CED217 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = A9E1D3452C67B0A300CED217 /* SwiftLintBuildToolPlugin */;
 		};
-		A9E1D3482C67B0A700CED217 /* PBXTargetDependency */ = {
+		D55832582DEF5F250049A7B4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = A9E1D3472C67B0A700CED217 /* SwiftLintBuildToolPlugin */;
+			productRef = D55832572DEF5F250049A7B4 /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -433,6 +423,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -582,6 +573,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -647,6 +639,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -1164,11 +1157,6 @@
 			package = 5661551B2AB8384200209B80 /* XCRemoteSwiftPackageReference "swift-package-list" */;
 			productName = SwiftPackageList;
 		};
-		56E7083C2BB06FCA00B08F0A /* SwiftPackageListPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5661551B2AB8384200209B80 /* XCRemoteSwiftPackageReference "swift-package-list" */;
-			productName = "plugin:SwiftPackageListPlugin";
-		};
 		802D05732D679D1F002469F2 /* SpeziHealthKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SpeziHealthKit;
@@ -1227,17 +1215,12 @@
 			package = 2FE5DC7329EDD8E6004B9AB4 /* XCRemoteSwiftPackageReference "SpeziFirebase" */;
 			productName = SpeziFirebaseAccountStorage;
 		};
-		A9E1D3422C67A3F800CED217 /* SwiftLintBuildToolPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2F66D20D2BB723180010D555 /* XCRemoteSwiftPackageReference "SwiftLint" */;
-			productName = "plugin:SwiftLintBuildToolPlugin";
-		};
 		A9E1D3452C67B0A300CED217 /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2F66D20D2BB723180010D555 /* XCRemoteSwiftPackageReference "SwiftLint" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
-		A9E1D3472C67B0A700CED217 /* SwiftLintBuildToolPlugin */ = {
+		D55832572DEF5F250049A7B4 /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2F66D20D2BB723180010D555 /* XCRemoteSwiftPackageReference "SwiftLint" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";

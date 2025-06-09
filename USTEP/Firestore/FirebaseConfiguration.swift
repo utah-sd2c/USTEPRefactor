@@ -13,7 +13,7 @@ import SpeziAccount
 import SpeziFirebaseAccount
 
 
-final class FirebaseConfiguration: Module, DefaultInitializable, @unchecked Sendable {
+final class FirebaseConfiguration: Module, DefaultInitializable, Observable, ObservableObject, @unchecked Sendable {
     enum ConfigurationError: Error {
         case userNotAuthenticatedYet
     }
@@ -62,7 +62,7 @@ final class FirebaseConfiguration: Module, DefaultInitializable, @unchecked Send
     }
 
 
-    private func setupTestAccount() async {
+//    private func setupTestAccount() async {
 //        guard let accountService, FeatureFlags.setupTestAccount else {
 //            return
 //        }
@@ -90,5 +90,5 @@ final class FirebaseConfiguration: Module, DefaultInitializable, @unchecked Send
 //        } catch {
 //            logger.error("Failed to setup test account: \(error)")
 //        }
-    }
+//    }
 }

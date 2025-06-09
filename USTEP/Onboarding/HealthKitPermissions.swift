@@ -37,14 +37,32 @@ struct HealthKitPermissions: View {
                     Spacer()
                 }
             }, actionView: {
-                OnboardingActionsView(
-                    "Grant Access",
-                    action: {
+//                OnboardingActionsView(
+//                    "Grant Access",
+//                    action: {
+//                        do {
+//                            healthKitProcessing = true
+//                            // HealthKit is not available in the preview simulator.
+//                            if ProcessInfo.processInfo.isPreviewSimulator {
+//                                try await _Concurrency.Task.sleep(for: .seconds(5))
+//                            } else {
+//                                try await healthKit.askForAuthorization()
+//                            }
+//                        } catch {
+//                            print("Could not request HealthKit permissions.")
+//                        }
+//                        healthKitProcessing = false
+//
+//                        onboardingNavigationPath.nextStep()
+//                    }
+//                )
+                // fixed concurrency issue
+                OnboardingActionsView("Grant Access") {
+                    healthKitProcessing = true
+                    Task {
                         do {
-                            healthKitProcessing = true
-                            // HealthKit is not available in the preview simulator.
                             if ProcessInfo.processInfo.isPreviewSimulator {
-                                try await _Concurrency.Task.sleep(for: .seconds(5))
+                                try await Task.sleep(for: .seconds(1.5))
                             } else {
                                 try await healthKit.askForAuthorization()
                             }
@@ -52,10 +70,10 @@ struct HealthKitPermissions: View {
                             print("Could not request HealthKit permissions.")
                         }
                         healthKitProcessing = false
-                        
                         onboardingNavigationPath.nextStep()
                     }
-                )
+                }
+
             }
         )
             .navigationBarBackButtonHidden(healthKitProcessing)
