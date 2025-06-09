@@ -5,30 +5,52 @@
 //
 // SPDX-License-Identifier: MIT
 //
-
+//
+//import Spezi
+//import SpeziFirebaseAccount
+//import SpeziViews
+//import SwiftUI
+//
+//
+//@main
+//struct USTEP: App {
+//    @UIApplicationDelegateAdaptor(USTEPDelegate.self) var appDelegate
+//    @AppStorage(StorageKeys.onboardingFlowComplete) var completedOnboardingFlow = false
+//
+//    
+//    var body: some Scene {
+//        WindowGroup {
+//            ZStack {
+//                if completedOnboardingFlow {
+//                    HomeView()
+//                } else {
+//                    EmptyView()
+//                }
+//            }
+//                .sheet(isPresented: !$completedOnboardingFlow) {
+//                    OnboardingFlow()
+//                }
+//                .testingSetup()
+//                .spezi(appDelegate)
+//        }
+//    }
+//}
 import Spezi
 import SpeziFirebaseAccount
 import SpeziViews
 import SwiftUI
-
+import SpeziOnboarding
 
 @main
 struct USTEP: App {
     @UIApplicationDelegateAdaptor(USTEPDelegate.self) var appDelegate
     @AppStorage(StorageKeys.onboardingFlowComplete) var completedOnboardingFlow = false
 
-    
     var body: some Scene {
         WindowGroup {
-            ZStack {
-                if completedOnboardingFlow {
-                    HomeView()
-                } else {
-                    EmptyView()
-                }
-            }
+            HomeView()
                 .sheet(isPresented: !$completedOnboardingFlow) {
-                    OnboardingFlow()
+                     OnboardingFlow()
                 }
                 .testingSetup()
                 .spezi(appDelegate)
