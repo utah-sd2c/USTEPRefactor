@@ -122,7 +122,7 @@ struct Contacts: View {
                 name: details.name ?? PersonNameComponents(),
                 image: Image(systemName: "person.circle.fill"),
                 title: "Registered User",
-                organization: "Your Organization",
+                organization: "Your Organization"
             )
         ]
     }
