@@ -38,25 +38,43 @@ struct NotificationPermissions: View {
                     Spacer()
                 }
             }, actionView: {
-                OnboardingActionsView(
-                    "Allow Notifications",
-                    action: {
+//                OnboardingActionsView(
+//                    "Allow Notifications",
+//                    action: {
+//                        do {
+//                            notificationProcessing = true
+//                            // Notification Authorization is not available in the preview simulator.
+//                            if ProcessInfo.processInfo.isPreviewSimulator {
+//                                try await _Concurrency.Task.sleep(for: .seconds(5))
+//                            } else {
+//                                try await requestNotificationAuthorization(options: [.alert, .sound, .badge])
+//                            }
+//                        } catch {
+//                            print("Could not request notification permissions.")
+//                        }
+//                        notificationProcessing = false
+//                        
+//                        onboardingNavigationPath.nextStep()
+//                    }
+                // fixed concurrency issue
+                OnboardingActionsView("Allow Notifications") {
+                    notificationProcessing = true
+                    
+                    Task {
                         do {
-                            notificationProcessing = true
-                            // Notification Authorization is not available in the preview simulator.
                             if ProcessInfo.processInfo.isPreviewSimulator {
-                                try await _Concurrency.Task.sleep(for: .seconds(5))
+                                try await Task.sleep(for: .seconds(1.5))
                             } else {
                                 try await requestNotificationAuthorization(options: [.alert, .sound, .badge])
                             }
                         } catch {
                             print("Could not request notification permissions.")
                         }
-                        notificationProcessing = false
                         
+                        notificationProcessing = false
                         onboardingNavigationPath.nextStep()
                     }
-                )
+                }
             }
         )
             .navigationBarBackButtonHidden(notificationProcessing)

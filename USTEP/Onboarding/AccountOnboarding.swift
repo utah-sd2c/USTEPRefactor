@@ -22,9 +22,7 @@ struct AccountOnboarding: View {
                 // played till the end before we navigate to the next step.
                 onboardingNavigationPath.nextStep()
             }
-        } header: {
-            AccountSetupHeader()
-        } continue: {
+        }  continue: {
             OnboardingActionsView(
                 "Next",
                 action: {
@@ -43,19 +41,6 @@ struct AccountOnboarding: View {
     }
         .previewWith {
             AccountConfiguration(service: InMemoryAccountService())
-        }
-}
-
-#Preview("Account Onboarding") {
-    var details = AccountDetails()
-    details.userId = "lelandstanford@stanford.edu"
-    details.name = PersonNameComponents(givenName: "Leland", familyName: "Stanford")
-    
-    return OnboardingStack {
-        AccountOnboarding()
-    }
-        .previewWith {
-            AccountConfiguration(service: InMemoryAccountService(), activeDetails: details)
         }
 }
 #endif
