@@ -201,10 +201,10 @@
         }
       }
     },
-    "Email and Password" : {
+    "Done" : {
 
     },
-    "Frailty Score" : {
+    "Email and Password" : {
 
     },
     "Grant Access" : {
@@ -711,16 +711,6 @@
         }
       }
     },
-    "Score: %lld (%@)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Score: %1$lld (%2$@)"
-          }
-        }
-      }
-    },
     "Sign Up" : {
 
     },
@@ -839,9 +829,6 @@
       }
     },
     "Submit a Form" : {
-
-    },
-    "Summary" : {
 
     },
     "SUPPORT" : {
@@ -1060,6 +1047,9 @@
       }
     },
     "WITHDRAW FROM STUDY" : {
+
+    },
+    "You can view your progress in the trends tab." : {
 
     },
     "Your Account" : {

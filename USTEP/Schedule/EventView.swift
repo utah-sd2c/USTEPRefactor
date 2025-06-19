@@ -63,7 +63,6 @@ struct EventView: View {
                            linkIdString.starts(with: "Edmonton"),
                            let firstAnswer = answer.answer?.first, // Get the first answer if it exists
                            let value = firstAnswer.value {
-                            
                             var answerScore: Int? = nil // Use optional for safer parsing
 
                             switch value {
@@ -142,21 +141,39 @@ struct FrailtyView: View {
     var body: some View {
         NavigationStack { // Wrap in NavigationStack if you want nav bar title/buttons
             VStack {
-                Spacer()
-                Text("Frailty Score")
+                Text(frailty.category + ".")
                     .font(.largeTitle)
-                    .padding(.bottom, 5)
-                Text("Score: \(frailty.score) (\(frailty.category))")
-                    .font(.title2)
+                    .fontWeight(.bold)
+                    .padding(.top, 80)
+                    .padding(.horizontal, 30)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(StorageKeys.surveyResult[frailty.category] ?? "It looks like...")
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 30)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                StyledGauge(userScore: Double(frailty.score), minScore: 0, maxScore: 15)
+                    .padding()
+                    .frame(minWidth: 150, maxWidth: 250)
                 Spacer()
-                Button("Close") {
-                    dismiss() // This dismisses the FrailtyView sheet
+                Text("You can view your progress in the trends tab.")
+                    .padding(.vertical, 15)
+                Button(action: {
+                    dismiss()
+                }) {
+                    Text("Done")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.accentColor)
+                        .foregroundColor(Color.white)
+                        .cornerRadius(10)
                 }
-                .buttonStyle(.borderedProminent)
-                .padding(.bottom)
+                .padding(.bottom, 50)
+                .padding(.horizontal, 20)
             }
-            .navigationTitle("Summary") // Set navigation title for the sheet
-            .navigationBarTitleDisplayMode(.inline)
+            .padding(.top, 20)
+            .padding(.bottom, 30)
         }
     }
 }
+
+
