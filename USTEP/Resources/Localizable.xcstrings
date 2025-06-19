@@ -204,6 +204,9 @@
     "Email and Password" : {
 
     },
+    "Frailty Score" : {
+
+    },
     "Grant Access" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -708,6 +711,16 @@
         }
       }
     },
+    "Score: %lld (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Score: %1$lld (%2$@)"
+          }
+        }
+      }
+    },
     "Sign Up" : {
 
     },
@@ -826,6 +839,9 @@
       }
     },
     "Submit a Form" : {
+
+    },
+    "Summary" : {
 
     },
     "SUPPORT" : {
