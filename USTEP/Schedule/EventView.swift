@@ -52,48 +52,27 @@ struct EventView: View {
                 event.complete()
                 
             
-                await standard.add(response: response)
+                await standard.submitByType(response: response, type: .edmonton)
+                await standard.submitByType(response: response, type: .wiq)
+                if standard.scoreByType(response: response, type: .veines) != nil {
+                    await standard.submitByType(response: response, type: .veines)
+                }
                 
                 // Process questionnaire results to calculate score
-                var edmontonScore = 0
-                if let answers = response.item {
-                    for answer in answers {
-                        // Check if linkId is not nil and starts with "Edmonton"
-                        if let linkIdString = answer.linkId.value?.string,
-                           linkIdString.starts(with: "Edmonton"),
-                           let firstAnswer = answer.answer?.first, // Get the first answer if it exists
-                           let value = firstAnswer.value {
-                            var answerScore: Int? = nil // Use optional for safer parsing
-
-                            switch value {
-                            case let .coding(codingData):
-                                answerScore = Int(codingData.code?.value?.string ?? "")
-                            case let .string(stringValue):
-                                answerScore = Int(stringValue.value?.string ?? "")
-                            default:
-                                // Handle other value types if necessary, or just ignore
-                                break
-                            }
-                            
-                            if let scoreToAdd = answerScore {
-                                edmontonScore += scoreToAdd
-                            }
-                        }
+                if let edmontonScore = standard.scoreByType(response: response, type: .edmonton) {
+                    // Determine category based on score
+                    let healthCategories = ["Healthy", "Vulnerable", "Frail"]
+                    var category = healthCategories[0]
+                    if edmontonScore > 10 {
+                        category = healthCategories[2]
+                    } else if edmontonScore > 5 {
+                        category = healthCategories[1]
                     }
+                    
+                    // Create the outcome and trigger the summary sheet
+                    self.frailtyOutcome = FrailtyOutcome(score: edmontonScore, category: category)
+                    self.showSummarySheet = true // Trigger presentation of the sheet
                 }
-                
-                // Determine category based on score
-                let healthCategories = ["Healthy", "Vulnerable", "Frail"]
-                var category = healthCategories[0]
-                if edmontonScore > 10 {
-                    category = healthCategories[2]
-                } else if edmontonScore > 5 {
-                    category = healthCategories[1]
-                }
-                
-                // Create the outcome and trigger the summary sheet
-                self.frailtyOutcome = FrailtyOutcome(score: edmontonScore, category: category)
-                self.showSummarySheet = true // Trigger presentation of the sheet
             }
             // This is where the summary sheet is presented
             .sheet(isPresented: $showSummarySheet) {

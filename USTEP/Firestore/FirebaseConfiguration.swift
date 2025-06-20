@@ -21,6 +21,18 @@ final class FirebaseConfiguration: Module, DefaultInitializable, Observable, Obs
     static var userCollection: CollectionReference {
         Firestore.firestore().collection("users")
     }
+    
+    static var edmontonCollection: CollectionReference {
+        Firestore.firestore().collection("edmontonsurveys")
+    }
+    
+    static var wiqCollection: CollectionReference {
+        Firestore.firestore().collection("wiqsurveys")
+    }
+    
+    static var veinesCollection: CollectionReference {
+        Firestore.firestore().collection("veinessurveys")
+    }
 
 
     @MainActor var userDocumentReference: DocumentReference {
@@ -40,6 +52,16 @@ final class FirebaseConfiguration: Module, DefaultInitializable, Observable, Obs
             }
 
             return Storage.storage().reference().child("users/\(details.accountId)")
+        }
+    }
+    
+    @MainActor var userID: String {
+        get throws {
+            guard let details = account?.details else {
+                throw ConfigurationError.userNotAuthenticatedYet
+            }
+
+            return details.accountId
         }
     }
 
