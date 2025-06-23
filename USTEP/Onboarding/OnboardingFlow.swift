@@ -80,6 +80,8 @@ import SpeziHealthKit
 import SpeziNotifications
 import SpeziOnboarding
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
 
 struct OnboardingFlow: View {
     @Environment(HealthKit.self) private var healthKit
@@ -114,7 +116,7 @@ struct OnboardingFlow: View {
                 NotificationPermissions()
             }
         }
-
+        
         .interactiveDismissDisabled(!completedOnboardingFlow)
         .task {
             await updateHealthKitStatus()
@@ -132,7 +134,7 @@ struct OnboardingFlow: View {
                         completedOnboardingFlow = true
                     }
                 }
-
+                
             }
         }
         // Adding this to complete onboarding when conditions are met
@@ -141,7 +143,80 @@ struct OnboardingFlow: View {
                 completedOnboardingFlow = true
             }
         }
-
+        .onChange(of: account.signedIn) { _, signedIn in
+            if signedIn {
+                print("🚀 User signed in, checking if user document exists...")
+                
+                // Try Spezi Account first
+                if let details = account.details {
+                    let userDocRef = Firestore.firestore().collection("users").document(details.accountId)
+                    
+                    // Check if document already exists
+                    userDocRef.getDocument { document, error in
+                        if let error = error {
+                            print("❌ Error checking user document: \(error)")
+                            return
+                        }
+                        
+                        if let document = document, document.exists {
+                            print("ℹ️ User document already exists, skipping creation")
+                            return
+                        }
+                        
+                        // Document doesn't exist, create it
+                        print("📝 Creating new user document...")
+                        let userData: [String: Any] = [
+                            "firstName": details.name?.givenName ?? "",
+                            "lastName": details.name?.familyName ?? "",
+                            "email": details.email ?? "",
+                            "dateJoined": Timestamp(date: Date())
+                        ]
+                        
+                        userDocRef.setData(userData) { error in
+                            if let error = error {
+                                print("❌ User document creation failed: \(error)")
+                            } else {
+                                print("✅ User document created successfully!")
+                            }
+                        }
+                    }
+                } else if let user = Auth.auth().currentUser {
+                    // Fallback to Firebase Auth
+                    let userDocRef = Firestore.firestore().collection("users").document(user.uid)
+                    
+                    // Check if document already exists
+                    userDocRef.getDocument { document, error in
+                        if let error = error {
+                            print("❌ Error checking Firebase user document: \(error)")
+                            return
+                        }
+                        
+                        if let document = document, document.exists {
+                            print("ℹ️ Firebase user document already exists, skipping creation")
+                            return
+                        }
+                        
+                        // Document doesn't exist, create it
+                        print("📝 Creating new Firebase user document...")
+                        let fullName = user.displayName?.components(separatedBy: " ") ?? []
+                        let userData: [String: Any] = [
+                            "firstName": fullName.first ?? "",
+                            "lastName": fullName.dropFirst().joined(separator: " "),
+                            "email": user.email ?? "",
+                            "dateJoined": Timestamp(date: Date())
+                        ]
+                        
+                        userDocRef.setData(userData) { error in
+                            if let error = error {
+                                print("❌ Firebase user document creation failed: \(error)")
+                            } else {
+                                print("✅ Firebase user document created successfully!")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     @MainActor

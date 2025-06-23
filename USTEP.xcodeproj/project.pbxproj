@@ -194,7 +194,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				D55832582DEF5F250049A7B4 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A973C0E42D7DC7C500BA148C /* USTEP */,
@@ -411,10 +410,6 @@
 			isa = PBXTargetDependency;
 			productRef = A9E1D3452C67B0A300CED217 /* SwiftLintBuildToolPlugin */;
 		};
-		D55832582DEF5F250049A7B4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = D55832572DEF5F250049A7B4 /* SwiftLintBuildToolPlugin */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -523,7 +518,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = edu.utah.ustep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Ad Hoc";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -733,7 +728,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = edu.utah.ustep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Ad Hoc";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -782,7 +777,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = edu.utah.ustep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Ad Hoc";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1216,11 +1211,6 @@
 			productName = SpeziFirebaseAccountStorage;
 		};
 		A9E1D3452C67B0A300CED217 /* SwiftLintBuildToolPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2F66D20D2BB723180010D555 /* XCRemoteSwiftPackageReference "SwiftLint" */;
-			productName = "plugin:SwiftLintBuildToolPlugin";
-		};
-		D55832572DEF5F250049A7B4 /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2F66D20D2BB723180010D555 /* XCRemoteSwiftPackageReference "SwiftLint" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
