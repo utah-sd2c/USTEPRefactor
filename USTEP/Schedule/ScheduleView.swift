@@ -35,7 +35,7 @@ struct ScheduleView: View {
                 .navigationTitle("Schedule")
                 .viewStateAlert(state: $scheduler.viewState)
                 .sheet(item: $presentedEvent) { event in
-//                    EventView(event)
+                    EventView(event)
                 }
                 .toolbar {
                     if account != nil {
