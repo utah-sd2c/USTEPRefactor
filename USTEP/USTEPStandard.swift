@@ -6,9 +6,11 @@
 // SPDX-License-Identifier: MIT
 //
 
+// swiftlint:disable function_body_length
 @preconcurrency import FirebaseFirestore
 @preconcurrency import FirebaseStorage
 import HealthKitOnFHIR
+import ModelsR4
 import OSLog
 @preconcurrency import PDFKit.PDFDocument
 import Spezi
@@ -30,6 +32,30 @@ actor USTEPStandard: Standard,
 
     @Dependency(FirebaseConfiguration.self) private var configuration
 
+    enum SurveyType {
+        case edmonton
+        case wiq
+        case veines
+    }
+    
+    static let surveyPrefix: [SurveyType:String] = [
+        .edmonton: "Edmonton",
+        .wiq: "WIQ",
+        .veines: "VEINES"
+    ]
+    
+    static let surveyCollectionName: [SurveyType:String] = [
+        .edmonton: "edmontonsurveys",
+        .wiq: "wiqsurveys",
+        .veines: "veinessurveys"
+    ]
+    
+    static let surveyCollection: [SurveyType:CollectionReference] = [
+        .edmonton: FirebaseConfiguration.edmontonCollection,
+        .wiq: FirebaseConfiguration.wiqCollection,
+        .veines: FirebaseConfiguration.veinesCollection
+    ]
+    
     init() {}
 
 
@@ -80,8 +106,119 @@ actor USTEPStandard: Standard,
         }
     }
     
+    // periphery:ignore:parameters isolation
+    func scoreByType(response: ModelsR4.QuestionnaireResponse, type: SurveyType, isolation: isolated (any Actor)? = #isolation) -> Int? {
+        var score: Int = 0
+        var anyFound: Bool = false
+        if let answers = response.item {
+            for answer in answers {
+                // Check if linkId is not nil and starts with the given prefix
+                if let linkIdString = answer.linkId.value?.string,
+                   let prefix = USTEPStandard.surveyPrefix[type],
+                   linkIdString.starts(with: prefix),
+                   let firstAnswer = answer.answer?.first, // Get the first answer if it exists
+                   let value = firstAnswer.value {
+                    var answerScore: Int? = nil // Use optional for safer parsing
+
+                    switch value {
+                    case let .coding(codingData):
+                        answerScore = Int(codingData.code?.value?.string ?? "")
+                        anyFound = true
+                    case let .string(stringValue):
+                        answerScore = Int(stringValue.value?.string ?? "")
+                        anyFound = true
+                    default:
+                        // Handle other value types if necessary, or just ignore
+                        break
+                    }
+                    if let scoreToAdd = answerScore {
+                        score += scoreToAdd
+                    }
+                }
+            }
+        }
+        return anyFound ? score : nil
+    }
     
-    private func healthKitDocument(id uuid: UUID) async throws -> DocumentReference {
+    func submitByType(response: ModelsR4.QuestionnaireResponse,
+                          type: SurveyType,
+                          isolation: isolated (any Actor)? = #isolation) async {
+        var score: Int = 0
+        if let surveyScore: Int = scoreByType(response: response, type: type) {
+            // We can process this request, as there is at least one question of the specified type
+            score = surveyScore
+        } else {
+            await logger.log("Trying to submit data that does not exist")
+            return
+        }
+        
+        let id = response.identifier?.value?.value?.string ?? UUID().uuidString
+        
+        if FeatureFlags.disableFirebase {
+            let jsonRepresentation = (try? String(data: JSONEncoder().encode(response), encoding: .utf8)) ?? ""
+            await logger.debug("Received questionnaire response: \(jsonRepresentation)")
+            return
+        }
+        
+        // Filter out any questions that don't start with the specified prefix
+        var indexesToRemove: [Int] = []
+        if let answers = response.item {
+            for (ind, answer) in answers.enumerated() {
+                // Check if linkId is not nil and starts with the given prefix
+                if let linkIdString = answer.linkId.value?.string,
+                   let prefix = USTEPStandard.surveyPrefix[type],
+                   linkIdString.starts(with: prefix) {
+                    // We'll process this item
+                    // TODO: Get the URL, if any, from this and upload that file?
+                } else {
+                    // We won't process this item
+                    indexesToRemove.append(ind)
+                }
+            }
+        }
+        for ind in indexesToRemove.reversed() {
+            response.item?.remove(at: ind)
+        }
+        
+        var userID: String = "PATIENT_ID"
+        do {
+            userID = try await configuration.userID
+        } catch {
+            await logger.error("Could not get logged in user's ID: \(error)")
+        }
+        response.subject = Reference(reference: FHIRPrimitive(FHIRString("Patient/\(userID)")))
+        
+        let questionnaireName: String = USTEPStandard.surveyPrefix[type]?.lowercased() ?? "unknown"
+        response.questionnaire = questionnaireName.asFHIRCanonicalPrimitive()
+        
+        // Create the summary that is stored in the user collection
+        let summary: [String: Any] = [
+            "score": score,
+            "type": questionnaireName,
+            "surveyId": id,
+            "dateCompleted": Timestamp()
+        ] as [String: Any]
+        
+        do {
+            try await configuration.userDocumentReference
+                .collection("QuestionnaireResponse") // Add all HealthKit sources in a /QuestionnaireResponse collection.
+                .document(id) // Set the document identifier to the id of the response.
+                .setData(summary)
+            if let collection = USTEPStandard.surveyCollection[type] {
+                try await collection
+                    .document(id)
+                    .setData(from: response)
+            } else {
+                print("Cannot find collection for type: \(type)")
+            }
+        } catch {
+            await logger.error("Could not store questionnaire response: \(error)")
+        }
+        
+        // TODO: Upload the clock draw as well
+    }
+    
+    private func healthKitDocument(id uuid: UUID) async throws -> FirebaseFirestore.DocumentReference {
         try await configuration.userDocumentReference
             .collection("HealthKit") // Add all HealthKit sources in a /HealthKit collection.
             .document(uuid.uuidString) // Set the document identifier to the UUID of the document.

@@ -219,6 +219,9 @@
     "Distance Traveled (mi)" : {
 
     },
+    "Done" : {
+
+    },
     "Email and Password" : {
 
     },
@@ -1082,6 +1085,9 @@
       }
     },
     "WITHDRAW FROM STUDY" : {
+
+    },
+    "You can view your progress in the trends tab." : {
 
     },
     "Your Account" : {

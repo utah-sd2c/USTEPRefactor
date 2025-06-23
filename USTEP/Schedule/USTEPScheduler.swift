@@ -11,6 +11,7 @@
 import Foundation
 import ResearchKit
 import Spezi
+import SpeziQuestionnaire
 import SpeziScheduler
 import SpeziViews
 import class ModelsR4.Questionnaire
@@ -24,7 +25,7 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
     @MainActor var viewState: ViewState = .idle
 
     init() {}
-    
+
     /// Add or update the current list of task upon app startup.
     func configure() {
         do {
@@ -42,7 +43,7 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                     title: "Demonstration Above",
                     text: """
                     Click to Play
-                    
+
                     When you're ready to start, click Get Started
                     """,
                     url: "https://firebasestorage.googleapis.com/v0/b/ustep-refactor.firebasestorage.app/o/video.mp4?alt=media&token=5cb96d28-1c8a-4b0b-9b1c-d69867856cf7"
@@ -109,10 +110,10 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 overrides.dict.updateValue("", forKey: "VEINES 6")
                 overrides.dict.updateValue("", forKey: "VEINES 7")
                 overrides.dict.updateValue("", forKey: "VEINES 8")
-                
+
                 let compQuestionnaire = CompoundQuestionnaire(
                     questionnaire: Bundle.main.questionnaire(
-                        withName: "EdmontonWIQVeinesQuestionnaire-en-US"
+                        withName: "EdmontonWIQQuestionnaire-en-US"
                     ),
                     stepsToInsert: stepsToInsert,
                     titleOverrides: overrides

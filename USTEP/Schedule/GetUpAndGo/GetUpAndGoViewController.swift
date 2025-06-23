@@ -21,27 +21,27 @@ class GetUpAndGoViewController: ORKActiveStepViewController {
     private var endTime: TimeInterval?
     private var results: NSMutableArray?
     private let visionStepView = GetUpAndGo()
-    
+
     override public init(step: ORKStep?) {
         super.init(step: step)
         suspendIfInactive = true
     }
-    
+
     @available(*, unavailable)
     internal required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override public func start() {
         super.start()
         startTime = ProcessInfo.processInfo.systemUptime
     }
-    
+
     override public func stepDidFinish() {
         super.stepDidFinish()
         goForward()
     }
-    
+
     @objc
     public func stopButtonHit() {
         endTime = ProcessInfo.processInfo.systemUptime
@@ -49,11 +49,11 @@ class GetUpAndGoViewController: ORKActiveStepViewController {
         visionStepView.continueButton.removeFromSuperview()
         showUserAnswers(time: duration)
     }
-    
+
     private func walkStep() -> GetUpAndGoStep {
         step as! GetUpAndGoStep
     }
-    
+
     @objc
     func showUserAnswers(time: Double) {
         visionStepView.question.text = "You took about " + String(Int(time.rounded())) + " seconds to complete that task. Does this seem right? Choose the best category you feel is most appropriate."
@@ -62,33 +62,33 @@ class GetUpAndGoViewController: ORKActiveStepViewController {
         visionStepView.answerButton3.isHidden = false
         visionStepView.question.isHidden = false
     }
-    
+
     @objc
     func answer1Chosen() {
         createResult(score: 2)
         stepDidFinish()
     }
-    
+
     @objc
     func answer2Chosen() {
         createResult(score: 1)
         stepDidFinish()
     }
-    
+
     @objc
     func answer3Chosen() {
         createResult(score: 0)
         stepDidFinish()
     }
-    
+
     override public func viewDidLoad() {
         super.viewDidLoad()
-        
+
         results = NSMutableArray()
 
         activeStepView?.customContentView = visionStepView
         activeStepView?.customContentFillsAvailableSpace = true
-        
+
         // /// These lines are needed INSTEAD OF THE ABOVE 2 if updating to newer ResearchKit versions
         // self.view!.addSubview(visionStepView)
         // visionStepView.translatesAutoresizingMaskIntoConstraints = false
@@ -98,28 +98,39 @@ class GetUpAndGoViewController: ORKActiveStepViewController {
         //     visionStepView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
         //     visionStepView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         // ])
-        
+
         visionStepView.continueButton.addTarget(self, action: #selector(stopButtonHit), for: .touchUpInside)
         visionStepView.answerButton1.addTarget(self, action: #selector(answer1Chosen), for: .touchUpInside)
         visionStepView.answerButton2.addTarget(self, action: #selector(answer2Chosen), for: .touchUpInside)
         visionStepView.answerButton3.addTarget(self, action: #selector(answer3Chosen), for: .touchUpInside)
-        
+
         customView = visionStepView
     }
-    
+
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         start()
     }
-    
+
     override public var result: ORKStepResult? {
-        let stepResult = super.result
-        if results != nil {
-            stepResult?.results = results?.copy() as? [ORKResult]
+        guard let stepResult = super.result else {
+            return nil
         }
-        return stepResult!
+        /*
+        guard let getUpAndGoResults = self.results as? [ORKResult] else {
+            return stepResult
+        }
+        let toReturn = ORKStepResult(stepIdentifier: self.step!.identifier, results: getUpAndGoResults)
+
+        toReturn.startDate = stepResult.startDate
+        toReturn.endDate = stepResult.endDate
+        
+        return toReturn
+        */
+        stepResult.results = self.results as? [ORKResult]
+        return stepResult
     }
-    
+
     private func createResult(score: Int) {
         let walkResult = GetUpAndGoStepResult(identifier: (step!.identifier))
         walkResult.score = score
@@ -130,30 +141,30 @@ class GetUpAndGoViewController: ORKActiveStepViewController {
 
 public class GetUpAndGo: UIView {
     var visionContentView: GetUpAndGoView?
-        
+
     let continueButtonCornerRadius: CGFloat = 12.0
     let visionContentTopPadding: CGFloat = 10.0
     let instructionLabelTopPadding: CGFloat = 15.0
-    
+
     let continueButton = ORKRoundTappingButton()
     let answerButton1 = UIButton()
     let answerButton2 = UIButton()
     let answerButton3 = UIButton()
     let question = UILabel()
-        
+
     private let minimumButtonHeight: CGFloat = 60.0
     private let buttonStackViewSpacing: CGFloat = 20.0
-    
+
     init() {
         super.init(frame: .zero)
         setup()
     }
-    
+
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     internal func setup() {
         setupVisionContentView()
         setupContinueButton()
@@ -161,14 +172,14 @@ public class GetUpAndGo: UIView {
         setupUserAnswers()
         setupConstraints()
     }
-    
+
     func setupVisionContentView() {
         if visionContentView == nil {
             visionContentView = GetUpAndGoView()
         }
         addSubview(visionContentView!)
     }
-    
+
     func setupContinueButton() {
         continueButton.diameter = 160.0
         continueButton.setTitle("STOP", for: UIControl.State.normal)
@@ -187,7 +198,7 @@ public class GetUpAndGo: UIView {
         answerButton1.setTitle("1-10 Seconds", for: UIControl.State.normal)
         answerButton2.setTitle("11-20 Seconds", for: UIControl.State.normal)
         answerButton3.setTitle(">21 Seconds", for: UIControl.State.normal)
-        
+
         [answerButton1, answerButton2, answerButton3].forEach {
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 18)
             $0.backgroundColor = .tintColor
@@ -197,7 +208,7 @@ public class GetUpAndGo: UIView {
             addSubview($0)
         }
     }
-    
+
     private func setupConstraints() {
         visionContentView?.translatesAutoresizingMaskIntoConstraints = false
         continueButton.translatesAutoresizingMaskIntoConstraints = false
@@ -205,9 +216,9 @@ public class GetUpAndGo: UIView {
         answerButton1.translatesAutoresizingMaskIntoConstraints = false
         answerButton3.translatesAutoresizingMaskIntoConstraints = false
         question.translatesAutoresizingMaskIntoConstraints = false
-        
+
         var constraints = [NSLayoutConstraint]()
-        
+
         constraints += [
             NSLayoutConstraint(
                 item: continueButton,
@@ -219,8 +230,8 @@ public class GetUpAndGo: UIView {
                 constant: 0.0
             )
         ]
-                                                    
-            
+
+
         constraints += [
             question.topAnchor.constraint(equalTo: topAnchor, constant: 16),
             question.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),

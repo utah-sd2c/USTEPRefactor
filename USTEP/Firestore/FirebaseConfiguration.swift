@@ -75,6 +75,18 @@ public final class FirebaseConfiguration: Module, DefaultInitializable, Observab
     public static var userCollection: CollectionReference {
         Firestore.firestore().collection("users")
     }
+    
+    static var edmontonCollection: CollectionReference {
+        Firestore.firestore().collection("edmontonsurveys")
+    }
+    
+    static var wiqCollection: CollectionReference {
+        Firestore.firestore().collection("wiqsurveys")
+    }
+    
+    static var veinesCollection: CollectionReference {
+        Firestore.firestore().collection("veinessurveys")
+    }
 
     // Store references to dependencies - will be set after Spezi initialization
     private var account: Account?
@@ -97,6 +109,16 @@ public final class FirebaseConfiguration: Module, DefaultInitializable, Observab
             }
 
             return Storage.storage().reference().child("users/\(details.accountId)")
+        }
+    }
+    
+    @MainActor var userID: String {
+        get throws {
+            guard let details = account?.details else {
+                throw ConfigurationError.userNotAuthenticatedYet
+            }
+
+            return details.accountId
         }
     }
 
