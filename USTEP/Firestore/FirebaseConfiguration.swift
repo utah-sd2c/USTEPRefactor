@@ -6,22 +6,79 @@
 // SPDX-License-Identifier: MIT
 //
 
+//import FirebaseFirestore
+//import FirebaseStorage
+//import Spezi
+//import SpeziAccount
+//import SpeziFirebaseAccount
+//
+//
+//final class FirebaseConfiguration: Module, DefaultInitializable, Observable, ObservableObject, @unchecked Sendable {
+//    enum ConfigurationError: Error {
+//        case userNotAuthenticatedYet
+//    }
+//
+//    static var userCollection: CollectionReference {
+//        Firestore.firestore().collection("users")
+//    }
+//
+//
+//    @MainActor var userDocumentReference: DocumentReference {
+//        get throws {
+//            guard let details = account?.details else {
+//                throw ConfigurationError.userNotAuthenticatedYet
+//            }
+//
+//            return userDocumentReference(for: details.accountId)
+//        }
+//    }
+//
+//    @MainActor var userBucketReference: StorageReference {
+//        get throws {
+//            guard let details = account?.details else {
+//                throw ConfigurationError.userNotAuthenticatedYet
+//            }
+//
+//            return Storage.storage().reference().child("users/\(details.accountId)")
+//        }
+//    }
+//
+//    @Application(\.logger) private var logger
+//
+//    @Dependency(Account.self) private var account: Account? // optional, as Firebase might be disabled
+//    @Dependency(FirebaseAccountService.self) private var accountService: FirebaseAccountService?
+//
+//    init() {}
+//
+//    func userDocumentReference(for accountId: String) -> DocumentReference {
+//        Self.userCollection.document(accountId)
+//    }
+//
+//
+//    func configure() {
+//        Task {
+//            // await setupTestAccount()
+//        }
+//    }
+import Foundation
 import FirebaseFirestore
 import FirebaseStorage
 import Spezi
 import SpeziAccount
 import SpeziFirebaseAccount
 
-
-final class FirebaseConfiguration: Module, DefaultInitializable, Observable, ObservableObject, @unchecked Sendable {
-    enum ConfigurationError: Error {
+public final class FirebaseConfiguration: Module, DefaultInitializable, Observable, ObservableObject, @unchecked Sendable {
+    public enum ConfigurationError: Error {
         case userNotAuthenticatedYet
     }
 
-    static var userCollection: CollectionReference {
+    public static var userCollection: CollectionReference {
         Firestore.firestore().collection("users")
     }
 
+    // Store references to dependencies - will be set after Spezi initialization
+    private var account: Account?
+    private var accountService: FirebaseAccountService?
 
     @MainActor var userDocumentReference: DocumentReference {
         get throws {
@@ -43,25 +100,23 @@ final class FirebaseConfiguration: Module, DefaultInitializable, Observable, Obs
         }
     }
 
-    @Application(\.logger) private var logger
+    public init() {}
 
-    @Dependency(Account.self) private var account: Account? // optional, as Firebase might be disabled
-    @Dependency(FirebaseAccountService.self) private var accountService: FirebaseAccountService?
+    // Method to inject dependencies after Spezi initialization
+    public func configure(account: Account?, accountService: FirebaseAccountService?) {
+        self.account = account
+        self.accountService = accountService
+    }
 
-    init() {}
-
-    func userDocumentReference(for accountId: String) -> DocumentReference {
+    public func userDocumentReference(for accountId: String) -> DocumentReference {
         Self.userCollection.document(accountId)
     }
 
-
-    func configure() {
+    public func configure() {
         Task {
             // await setupTestAccount()
         }
     }
-
-
 //    private func setupTestAccount() async {
 //        guard let accountService, FeatureFlags.setupTestAccount else {
 //            return

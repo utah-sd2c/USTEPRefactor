@@ -45,6 +45,8 @@ import SpeziOnboarding
 struct USTEP: App {
     @UIApplicationDelegateAdaptor(USTEPDelegate.self) var appDelegate
     @AppStorage(StorageKeys.onboardingFlowComplete) var completedOnboardingFlow = false
+    @StateObject var healthKitManager = HealthKitManager()
+    @StateObject var firestoreManager = FirestoreManager()
 
     var body: some Scene {
         WindowGroup {
@@ -54,6 +56,8 @@ struct USTEP: App {
                 }
                 .testingSetup()
                 .spezi(appDelegate)
+                .environmentObject(healthKitManager)
+                .environmentObject(firestoreManager)
         }
     }
 }

@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%.2f" : {
+
+    },
+    "%lld" : {
+
+    },
     "+1 (801) 587-1450" : {
 
     },
@@ -81,6 +87,9 @@
           }
         }
       }
+    },
+    "Activity" : {
+
     },
     "Allow Notifications" : {
       "extractionState" : "stale",
@@ -200,6 +209,15 @@
           }
         }
       }
+    },
+    "Date" : {
+
+    },
+    "Distance Traveled" : {
+
+    },
+    "Distance Traveled (mi)" : {
+
     },
     "Email and Password" : {
 
@@ -560,6 +578,9 @@
     "LOGIN" : {
 
     },
+    "miles" : {
+
+    },
     "Monitor your progress" : {
 
     },
@@ -677,9 +698,6 @@
     "Profile" : {
 
     },
-    "QUESTIONNAIRE_LOADING_ERROR_MESSAGE" : {
-
-    },
     "REPORT A PROBLEM" : {
 
     },
@@ -735,6 +753,9 @@
           }
         }
       }
+    },
+    "Six Minute Walk Test" : {
+
     },
     "Social Support Questionnaire" : {
       "localizations" : {
@@ -825,6 +846,15 @@
         }
       }
     },
+    "Step Count" : {
+
+    },
+    "steps" : {
+
+    },
+    "Steps" : {
+
+    },
     "Submit a Form" : {
 
     },
@@ -878,6 +908,7 @@
       }
     },
     "This type of event is currently unsupported. Please contact the developer of this app." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -899,6 +930,12 @@
         }
       }
     },
+    "Total Daily Distance Traveled (mi)" : {
+
+    },
+    "Total Daily Steps" : {
+
+    },
     "Track your health" : {
 
     },
@@ -909,6 +946,7 @@
 
     },
     "Unsupported Event" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

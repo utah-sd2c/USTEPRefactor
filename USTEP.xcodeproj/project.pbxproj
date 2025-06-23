@@ -194,7 +194,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				D55832582DEF5F250049A7B4 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A973C0E42D7DC7C500BA148C /* USTEP */,
@@ -411,10 +410,6 @@
 			isa = PBXTargetDependency;
 			productRef = A9E1D3452C67B0A300CED217 /* SwiftLintBuildToolPlugin */;
 		};
-		D55832582DEF5F250049A7B4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = D55832572DEF5F250049A7B4 /* SwiftLintBuildToolPlugin */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -523,7 +518,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = edu.utah.ustep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Ad Hoc";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -733,7 +728,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = edu.utah.ustep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Ad Hoc";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -782,7 +777,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = edu.utah.ustep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "UofU U-STEP Ad Hoc";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -968,8 +963,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/StanfordSpezi/SpeziQuestionnaire.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.3;
+				kind = exactVersion;
+				version = 1.1.0;
 			};
 		};
 		2FE5DC8829EDD972004B9AB4 /* XCRemoteSwiftPackageReference "SpeziStorage" */ = {
@@ -1048,8 +1043,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/StanfordBDHG/ResearchKitOnFHIR.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.2;
+				kind = exactVersion;
+				version = 1.1.0;
 			};
 		};
 		A94DDFFB2CBD1190004930BD /* XCRemoteSwiftPackageReference "SpeziNotifications" */ = {
@@ -1216,11 +1211,6 @@
 			productName = SpeziFirebaseAccountStorage;
 		};
 		A9E1D3452C67B0A300CED217 /* SwiftLintBuildToolPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2F66D20D2BB723180010D555 /* XCRemoteSwiftPackageReference "SwiftLint" */;
-			productName = "plugin:SwiftLintBuildToolPlugin";
-		};
-		D55832572DEF5F250049A7B4 /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2F66D20D2BB723180010D555 /* XCRemoteSwiftPackageReference "SwiftLint" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
