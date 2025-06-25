@@ -65,8 +65,9 @@ struct FrailtyOutcome: Identifiable, Hashable, Codable {
 }
 
 struct EventView: View {
-    private let event: Event // The event triggering this questionnaire
+    private var event: Event // The event triggering this questionnaire
 
+    @Environment(USTEPScheduler.self) private var scheduler
     @Environment(USTEPStandard.self) private var standard // Assuming this is set up correctly
     @Environment(\.dismiss) private var dismiss // To dismiss the EventView itself
 
@@ -75,7 +76,8 @@ struct EventView: View {
     @State private var showSummarySheet = false
 
     var body: some View {
-        if let compoundQuestionnaire = event.task.compoundQuestionnaire {
+        if let originalCompoundQuestionnaire = event.task.compoundQuestionnaire {
+            let compoundQuestionnaire = scheduler.compoundQuestionnaire ?? originalCompoundQuestionnaire
             CompoundQuestionnaireView(compoundQuestionnaire: compoundQuestionnaire) { result in
                 // This closure runs AFTER the questionnaire finishes
                 

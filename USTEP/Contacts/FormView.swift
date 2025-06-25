@@ -15,6 +15,7 @@ import SpeziAccount
 struct FormView: View {
     @Environment(Account.self) private var account
     @EnvironmentObject var firestoreManager: FirestoreManager
+    @Environment(USTEPScheduler.self) private var scheduler: USTEPScheduler
     @Binding var disease: String
     @Binding var isEditing: Bool
     var body: some View {
@@ -54,8 +55,12 @@ struct FormView: View {
     private func saveDisease() {
         // Stores condition locally in UserDefaults
         let defaults = UserDefaults.standard
+        let scheduleResetNeeded: Bool = disease != defaults.string(forKey: "disease")
         defaults.set(disease, forKey: "disease")
-
+        if scheduleResetNeeded {
+            scheduler.configure()
+        }
+        
         Task {
             guard let details = account.details else { return }
             

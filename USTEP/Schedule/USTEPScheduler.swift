@@ -23,7 +23,8 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
     @Dependency(Scheduler.self) @ObservationIgnored private var scheduler
 
     @MainActor var viewState: ViewState = .idle
-
+    @MainActor var compoundQuestionnaire: CompoundQuestionnaire?
+    
     init() {}
 
     /// Add or update the current list of task upon app startup.
@@ -111,14 +112,28 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 overrides.dict.updateValue("", forKey: "VEINES 7")
                 overrides.dict.updateValue("", forKey: "VEINES 8")
 
+                var surveyName: String = "EdmontonWIQVeinesQuestionnaire-en-US"
+                let defaults = UserDefaults.standard
+                if let disease = defaults.string(forKey: "disease") {
+                    if disease == StorageKeys.conditions[0] {
+                        // If the user has the Arterial Disease diagnosis
+                        surveyName = "EdmontonWIQQuestionnaire-en-US"
+                    }
+                }
+                
                 let compQuestionnaire = CompoundQuestionnaire(
                     questionnaire: Bundle.main.questionnaire(
-                        withName: "EdmontonWIQQuestionnaire-en-US"
+                        withName: surveyName
                     ),
                     stepsToInsert: stepsToInsert,
                     titleOverrides: overrides
                 )
-                context.compoundQuestionnaire = compQuestionnaire
+                
+                self.compoundQuestionnaire = compQuestionnaire
+                
+                var newContext = context
+                newContext.compoundQuestionnaire = compQuestionnaire
+                context = newContext
             }
         } catch {
             viewState = .error(AnyLocalizedError(error: error, defaultErrorDescription: "Failed to create or update scheduled tasks."))
