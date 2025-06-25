@@ -161,9 +161,22 @@ actor USTEPStandard: Standard,
             return
         }
         
+        // Make a deep copy of the response so we don't modify the object passed in
+        var copiedResponse: ModelsR4.QuestionnaireResponse
+        do{
+            let encoder = JSONEncoder()
+            let decoder = JSONDecoder()
+            let data = try encoder.encode(response)
+            copiedResponse = try decoder.decode(ModelsR4.QuestionnaireResponse.self, from: data)
+        } catch {
+            await logger.error("Error copying questionnaire response for processing: \(error)")
+            return
+        }
+        
+        
         // Filter out any questions that don't start with the specified prefix
         var indexesToRemove: [Int] = []
-        if let answers = response.item {
+        if let answers = copiedResponse.item {
             for (ind, answer) in answers.enumerated() {
                 // Check if linkId is not nil and starts with the given prefix
                 if let linkIdString = answer.linkId.value?.string,
@@ -178,7 +191,7 @@ actor USTEPStandard: Standard,
             }
         }
         for ind in indexesToRemove.reversed() {
-            response.item?.remove(at: ind)
+            copiedResponse.item?.remove(at: ind)
         }
         
         var userID: String = "PATIENT_ID"
@@ -191,7 +204,7 @@ actor USTEPStandard: Standard,
         response.subject = Reference(reference: FHIRPrimitive(FHIRString("Patient/\(userID)")))
         
         let questionnaireName: String = USTEPStandard.surveyPrefix[type]?.lowercased() ?? "unknown"
-        response.questionnaire = questionnaireName.asFHIRCanonicalPrimitive()
+        copiedResponse.questionnaire = questionnaireName.asFHIRCanonicalPrimitive()
         
         // Create the summary that is stored in the user collection
         let summary: [String: Any] = [
@@ -209,7 +222,7 @@ actor USTEPStandard: Standard,
             if let collection = USTEPStandard.surveyCollection[type] {
                 try await collection
                     .document(id)
-                    .setData(from: response)
+                    .setData(from: copiedResponse)
             } else {
                 print("Cannot find collection for type: \(type)")
             }
