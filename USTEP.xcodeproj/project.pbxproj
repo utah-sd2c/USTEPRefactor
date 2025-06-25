@@ -72,6 +72,22 @@
 			);
 			target = 653A254C283387FE005D4D48 /* USTEP */;
 		};
+		D50F4C6D2E0B15380073BE37 /* Exceptions for "USTEP" folder in "USTEPTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Supporting Files/GoogleService-Info.plist",
+				"Supporting Files/GoogleService-Info.plist 2.license",
+			);
+			target = 653A255C28338800005D4D48 /* USTEPTests */;
+		};
+		D50F4C6E2E0B15380073BE37 /* Exceptions for "USTEP" folder in "USTEPUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Supporting Files/GoogleService-Info.plist",
+				"Supporting Files/GoogleService-Info.plist 2.license",
+			);
+			target = 653A256628338800005D4D48 /* USTEPUITests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -79,6 +95,8 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A973C10B2D7DC7C600BA148C /* Exceptions for "USTEP" folder in "USTEP" target */,
+				D50F4C6D2E0B15380073BE37 /* Exceptions for "USTEP" folder in "USTEPTests" target */,
+				D50F4C6E2E0B15380073BE37 /* Exceptions for "USTEP" folder in "USTEPUITests" target */,
 			);
 			path = USTEP;
 			sourceTree = "<group>";

@@ -37,15 +37,14 @@ class USTEPDelegate: SpeziAppDelegate {
                         // .collects(\.dateOfBirth)
                     ]
                 )
-
+                FirebaseConfiguration()
                 firestore
                 if FeatureFlags.useFirebaseEmulator {
                     FirebaseStorageConfiguration(emulatorSettings: (host: "localhost", port: 9199))
                 } else {
                     FirebaseStorageConfiguration()
                 }
-            }
-
+            } 
             healthKit
             
             USTEPScheduler()

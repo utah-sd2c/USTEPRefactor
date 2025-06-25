@@ -120,6 +120,9 @@
     "App Icon" : {
 
     },
+    "Change your diagnosis" : {
+
+    },
     "Close" : {
       "localizations" : {
         "de" : {
@@ -213,6 +216,9 @@
     "Date" : {
 
     },
+    "Diagnosis" : {
+
+    },
     "Distance Traveled" : {
 
     },
@@ -220,6 +226,9 @@
 
     },
     "Done" : {
+
+    },
+    "Edit" : {
 
     },
     "Email and Password" : {
@@ -676,6 +685,9 @@
         }
       }
     },
+    "Please consult your doctor if you are unsure." : {
+
+    },
     "Please fill out the Social Support Questionnaire every day." : {
       "localizations" : {
         "de" : {
@@ -701,10 +713,16 @@
     "Profile" : {
 
     },
+    "QUESTIONNAIRE_LOADING_ERROR_MESSAGE" : {
+
+    },
     "REPORT A PROBLEM" : {
 
     },
     "Report your health outcomes" : {
+
+    },
+    "Save" : {
 
     },
     "Schedule" : {
@@ -728,6 +746,12 @@
           }
         }
       }
+    },
+    "Select your condition" : {
+
+    },
+    "Settings" : {
+
     },
     "Sign Up" : {
 
@@ -911,7 +935,6 @@
       }
     },
     "This type of event is currently unsupported. Please contact the developer of this app." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -949,7 +972,6 @@
 
     },
     "Unsupported Event" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1083,6 +1105,9 @@
           }
         }
       }
+    },
+    "What is your diagnosis?" : {
+
     },
     "WITHDRAW FROM STUDY" : {
 
