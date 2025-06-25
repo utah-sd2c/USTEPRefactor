@@ -80,6 +80,8 @@ import SpeziHealthKit
 import SpeziNotifications
 import SpeziOnboarding
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
 
 struct OnboardingFlow: View {
     @Environment(HealthKit.self) private var healthKit
@@ -91,19 +93,24 @@ struct OnboardingFlow: View {
     @AppStorage("isSigningUp") private var isSigningUp = true
     @State private var localNotificationAuthorization = false
     @State private var healthKitAuthorizationStatus = false
+    @State private var hasSelectedDisease = false
+    @State private var isCheckingDiseaseStatus = true
     
     var body: some View {
         OnboardingStack(onboardingFlowComplete: $completedOnboardingFlow) {
             Welcome()
             AccountSetupHeader()
             
-            // Our logic will decide which view to show
             Consent()
             UtahSignUp()
             UtahLogin()
             
             if !FeatureFlags.disableFirebase {
                 AccountOnboarding()
+            }
+            
+            if !hasSelectedDisease && !isCheckingDiseaseStatus {
+                ConditionQuestion()
             }
             
             if HKHealthStore.isHealthDataAvailable() && !healthKitAuthorizationStatus {
@@ -114,7 +121,6 @@ struct OnboardingFlow: View {
                 NotificationPermissions()
             }
         }
-
         .interactiveDismissDisabled(!completedOnboardingFlow)
         .task {
             await updateHealthKitStatus()
@@ -124,7 +130,6 @@ struct OnboardingFlow: View {
             
             Task {
                 localNotificationAuthorization = await notificationSettings().authorizationStatus == .authorized
-                
                 await updateHealthKitStatus()
                 
                 await MainActor.run {
@@ -132,16 +137,84 @@ struct OnboardingFlow: View {
                         completedOnboardingFlow = true
                     }
                 }
-
             }
         }
-        // Adding this to complete onboarding when conditions are met
         .onChange(of: localNotificationAuthorization) { _, authorized in
             if account.signedIn && authorized && healthKitAuthorizationStatus && !completedOnboardingFlow {
                 completedOnboardingFlow = true
             }
         }
-
+        .onChange(of: account.signedIn) { _, signedIn in
+            if signedIn {
+                checkDiseaseStatus()
+                
+                if let details = account.details {
+                    let userDocRef = Firestore.firestore().collection("users").document(details.accountId)
+                    userDocRef.getDocument { document, error in
+                        if let error = error {
+                            return
+                        }
+                        
+                        if let document = document, document.exists {
+                            return
+                        }
+                        
+                        let userData: [String: Any] = [
+                            "firstName": details.name?.givenName ?? "",
+                            "lastName": details.name?.familyName ?? "",
+                            "email": details.email ?? "",
+                            "dateJoined": Timestamp(date: Date())
+                        ]
+                        
+                        userDocRef.setData(userData)
+                    }
+                } else if let user = Auth.auth().currentUser {
+                    let userDocRef = Firestore.firestore().collection("users").document(user.uid)
+                    
+                    userDocRef.getDocument { document, error in
+                        if let error = error {
+                            return
+                        }
+                        
+                        if let document = document, document.exists {
+                            return
+                        }
+                        
+                        let fullName = user.displayName?.components(separatedBy: " ") ?? []
+                        let userData: [String: Any] = [
+                            "firstName": fullName.first ?? "",
+                            "lastName": fullName.dropFirst().joined(separator: " "),
+                            "email": user.email ?? "",
+                            "dateJoined": Timestamp(date: Date())
+                        ]
+                        
+                        userDocRef.setData(userData)
+                    }
+                }
+            }
+        }
+    }
+    
+    // New function to check if the User has already selected a disease
+    private func checkDiseaseStatus() {
+        guard let details = account.details else { return }
+        
+        isCheckingDiseaseStatus = true
+        let userDocRef = Firestore.firestore().collection("users").document(details.accountId)
+        
+        userDocRef.getDocument { document, error in
+            DispatchQueue.main.async {
+                if let document = document,
+                   document.exists,
+                   let disease = document.get("disease") as? String,
+                   !disease.isEmpty && disease != "Choose Diagnosis" {
+                    hasSelectedDisease = true
+                } else {
+                    hasSelectedDisease = false
+                }
+                isCheckingDiseaseStatus = false
+            }
+        }
     }
     
     @MainActor

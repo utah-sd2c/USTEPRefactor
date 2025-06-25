@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%.2f" : {
+
+    },
+    "%lld" : {
+
+    },
     "+1 (801) 587-1450" : {
 
     },
@@ -82,6 +88,9 @@
         }
       }
     },
+    "Activity" : {
+
+    },
     "Allow Notifications" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -109,6 +118,9 @@
 
     },
     "App Icon" : {
+
+    },
+    "Change your diagnosis" : {
 
     },
     "Close" : {
@@ -201,7 +213,22 @@
         }
       }
     },
+    "Date" : {
+
+    },
+    "Diagnosis" : {
+
+    },
+    "Distance Traveled" : {
+
+    },
+    "Distance Traveled (mi)" : {
+
+    },
     "Done" : {
+
+    },
+    "Edit" : {
 
     },
     "Email and Password" : {
@@ -563,6 +590,9 @@
     "LOGIN" : {
 
     },
+    "miles" : {
+
+    },
     "Monitor your progress" : {
 
     },
@@ -655,6 +685,9 @@
         }
       }
     },
+    "Please consult your doctor if you are unsure." : {
+
+    },
     "Please fill out the Social Support Questionnaire every day." : {
       "localizations" : {
         "de" : {
@@ -689,6 +722,9 @@
     "Report your health outcomes" : {
 
     },
+    "Save" : {
+
+    },
     "Schedule" : {
       "localizations" : {
         "de" : {
@@ -710,6 +746,12 @@
           }
         }
       }
+    },
+    "Select your condition" : {
+
+    },
+    "Settings" : {
+
     },
     "Sign Up" : {
 
@@ -738,6 +780,9 @@
           }
         }
       }
+    },
+    "Six Minute Walk Test" : {
+
     },
     "Social Support Questionnaire" : {
       "localizations" : {
@@ -828,6 +873,15 @@
         }
       }
     },
+    "Step Count" : {
+
+    },
+    "steps" : {
+
+    },
+    "Steps" : {
+
+    },
     "Submit a Form" : {
 
     },
@@ -901,6 +955,12 @@
           }
         }
       }
+    },
+    "Total Daily Distance Traveled (mi)" : {
+
+    },
+    "Total Daily Steps" : {
+
     },
     "Track your health" : {
 
@@ -1045,6 +1105,9 @@
           }
         }
       }
+    },
+    "What is your diagnosis?" : {
+
     },
     "WITHDRAW FROM STUDY" : {
 

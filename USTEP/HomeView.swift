@@ -57,6 +57,8 @@ import SwiftUI
 import SpeziOnboarding
 import SpeziFirebaseAccount
 import SpeziViews
+import SpeziAccount
+import BackgroundTasks
 
 struct HomeView: View {
     enum Tabs: String {
@@ -65,13 +67,13 @@ struct HomeView: View {
         case contact
     }
     
-    
     @AppStorage(StorageKeys.homeTabSelection) private var selectedTab = Tabs.schedule
     @AppStorage(StorageKeys.tabViewCustomization) private var tabViewCustomization = TabViewCustomization()
-    
     @State private var presentingAccount = false
     @Environment(Account.self) private var account
+    @StateObject private var healthKitManager = HealthKitManager()
     @AppStorage(StorageKeys.onboardingFlowComplete) private var completedOnboardingFlow = false
+    @Environment(\.scenePhase) var scenePhase
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -80,6 +82,7 @@ struct HomeView: View {
             }
             .customizationID("home.schedule")
             Tab("Trends", systemImage: "chart.line.uptrend.xyaxis", value: .trends) {
+                Trends(presentingAccount: $presentingAccount)
             }
             .customizationID("home.trends")
             Tab("Profile", systemImage: "person.fill", value: .contact) {
@@ -89,7 +92,6 @@ struct HomeView: View {
         }
         .tabViewStyle(.sidebarAdaptable)
         .tabViewCustomization($tabViewCustomization)
-        // Single sheet that shows either onboarding or account based on state
         .sheet(isPresented: shouldShowSheet) {
             if !completedOnboardingFlow {
                 OnboardingFlow()
@@ -97,9 +99,21 @@ struct HomeView: View {
                 AccountSheet(dismissAfterSignIn: false)
             }
         }
+        .onAppear {
+            healthKitManager.configure(account: account)
+            healthKitManager.startConfiguration()
+            syncData()
+        }
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active {
+                syncData()
+            }
+        }
+        .onChange(of: selectedTab) { _ in
+            syncData()
+        }
     }
     
-    // Add this computed property to show sheets
     private var shouldShowSheet: Binding<Bool> {
         Binding(
             get: {
@@ -113,18 +127,29 @@ struct HomeView: View {
         )
     }
     
-    private var shouldPresentAccountSheet: Binding<Bool> {
-        Binding(
-            get: { presentingAccount && completedOnboardingFlow },
-            set: { presentingAccount = $0 }
-        )
+    private func syncData() {
+        guard account.signedIn else { return }
+        
+        healthKitManager.enhancedSmartSync { success in
+            DispatchQueue.main.async {
+                if !success {
+                    self.fallbackSync()
+                }
+            }
+        }
+    }
+    
+    @MainActor
+    private func fallbackSync() {
+        healthKitManager.stepCountCollectionExistsAndUpload { _ in }
+        healthKitManager.distanceDataCollectionExistsAndUpload { _ in }
     }
 }
 #if DEBUG
 #Preview {
     var details = AccountDetails()
     
-    return HomeView()
+    HomeView()
         .previewWith(standard: USTEPStandard()) {
             USTEPScheduler()
             AccountConfiguration(service: InMemoryAccountService(), activeDetails: details)

@@ -44,13 +44,10 @@
 //        }
 //}
 //#endif
-
-// New AccountSetupHeader to show us slides during Onboarding and decide what to show based of selection
+//
 @_spi(TestingSupport) import SpeziAccount
 import SpeziFirebaseAccount
 import SwiftUI
-import FirebaseAuth
-import FirebaseFirestore
 import SpeziOnboarding
 
 struct AccountSetupHeader: View {
@@ -58,8 +55,6 @@ struct AccountSetupHeader: View {
     @Environment(OnboardingNavigationPath.self) private var onboardingNavigationPath
     @AppStorage(StorageKeys.onboardingFlowComplete) private var completedOnboardingFlow = false
     @AppStorage("isSigningUp") private var isSigningUp = true
-
-    @State private var hasProcessedSignIn = false
 
     var body: some View {
         VStack {
@@ -83,16 +78,10 @@ struct AccountSetupHeader: View {
             actionView
         }
         .padding()
-        .onAppear {
-            if account.signedIn && !hasProcessedSignIn {
-                hasProcessedSignIn = true
-                handleUserSignedIn()
-            }
-        }
         .onChange(of: account.signedIn) { _, signedIn in
-            if signedIn && !hasProcessedSignIn {
-                hasProcessedSignIn = true
-                handleUserSignedIn()
+            if signedIn {
+                completedOnboardingFlow = true
+                onboardingNavigationPath.nextStep()
             }
         }
     }
@@ -152,46 +141,12 @@ struct AccountSetupHeader: View {
             .padding(.horizontal)
         }
     }
-
-    private func handleUserSignedIn() {
-        completedOnboardingFlow = true
-        onboardingNavigationPath.nextStep()
-
-        guard let user = Auth.auth().currentUser else {
-            print("No current user available.")
-            return
-        }
-
-        guard Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil else {
-            print("GoogleService-Info.plist not found. Skipping Firestore write.")
-            return
-        }
-
-        let fullName = user.displayName?.components(separatedBy: " ") ?? []
-        let firstName = fullName.first ?? ""
-        let lastName = fullName.dropFirst().joined(separator: " ")
-        let email = user.email ?? ""
-
-        let data: [String: Any] = [
-            "firstName": firstName,
-            "lastName": lastName,
-            "email": email,
-            "dateJoined": Timestamp()
-        ]
-
-        Firestore.firestore().collection("users").document(user.uid).setData(data) { error in
-            if let error = error {
-                print("Firestore write failed: \(error.localizedDescription)")
-            } else {
-                print("User document written to Firestore")
-            }
-        }
-    }
 }
+
 #if DEBUG
 #Preview("With OnboardingStack") {
     OnboardingStack {
-        AccountSetupHeader() 
+        AccountSetupHeader()
     }
     .previewWith {
         OnboardingDataSource()

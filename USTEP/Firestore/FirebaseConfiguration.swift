@@ -6,19 +6,75 @@
 // SPDX-License-Identifier: MIT
 //
 
+//import FirebaseFirestore
+//import FirebaseStorage
+//import Spezi
+//import SpeziAccount
+//import SpeziFirebaseAccount
+//
+//
+//final class FirebaseConfiguration: Module, DefaultInitializable, Observable, ObservableObject, @unchecked Sendable {
+//    enum ConfigurationError: Error {
+//        case userNotAuthenticatedYet
+//    }
+//
+//    static var userCollection: CollectionReference {
+//        Firestore.firestore().collection("users")
+//    }
+//
+//
+//    @MainActor var userDocumentReference: DocumentReference {
+//        get throws {
+//            guard let details = account?.details else {
+//                throw ConfigurationError.userNotAuthenticatedYet
+//            }
+//
+//            return userDocumentReference(for: details.accountId)
+//        }
+//    }
+//
+//    @MainActor var userBucketReference: StorageReference {
+//        get throws {
+//            guard let details = account?.details else {
+//                throw ConfigurationError.userNotAuthenticatedYet
+//            }
+//
+//            return Storage.storage().reference().child("users/\(details.accountId)")
+//        }
+//    }
+//
+//    @Application(\.logger) private var logger
+//
+//    @Dependency(Account.self) private var account: Account? // optional, as Firebase might be disabled
+//    @Dependency(FirebaseAccountService.self) private var accountService: FirebaseAccountService?
+//
+//    init() {}
+//
+//    func userDocumentReference(for accountId: String) -> DocumentReference {
+//        Self.userCollection.document(accountId)
+//    }
+//
+//
+//    func configure() {
+//        Task {
+//            // await setupTestAccount()
+//        }
+//    }
+import Foundation
 import FirebaseFirestore
 import FirebaseStorage
 import Spezi
 import SpeziAccount
 import SpeziFirebaseAccount
 
-
-final class FirebaseConfiguration: Module, DefaultInitializable, Observable, ObservableObject, @unchecked Sendable {
-    enum ConfigurationError: Error {
+public final class FirebaseConfiguration: Module, DefaultInitializable, Observable, ObservableObject, @unchecked Sendable {
+    public enum ConfigurationError: Error {
         case userNotAuthenticatedYet
     }
+    
+    @Dependency(Account.self) private var account
 
-    static var userCollection: CollectionReference {
+    public static var userCollection: CollectionReference {
         Firestore.firestore().collection("users")
     }
     
@@ -34,10 +90,9 @@ final class FirebaseConfiguration: Module, DefaultInitializable, Observable, Obs
         Firestore.firestore().collection("veinessurveys")
     }
 
-
     @MainActor var userDocumentReference: DocumentReference {
         get throws {
-            guard let details = account?.details else {
+            guard let details = account.details else {
                 throw ConfigurationError.userNotAuthenticatedYet
             }
 
@@ -47,7 +102,7 @@ final class FirebaseConfiguration: Module, DefaultInitializable, Observable, Obs
 
     @MainActor var userBucketReference: StorageReference {
         get throws {
-            guard let details = account?.details else {
+            guard let details = account.details else {
                 throw ConfigurationError.userNotAuthenticatedYet
             }
 
@@ -57,7 +112,7 @@ final class FirebaseConfiguration: Module, DefaultInitializable, Observable, Obs
     
     @MainActor var userID: String {
         get throws {
-            guard let details = account?.details else {
+            guard let details = account.details else {
                 throw ConfigurationError.userNotAuthenticatedYet
             }
 
@@ -65,25 +120,17 @@ final class FirebaseConfiguration: Module, DefaultInitializable, Observable, Obs
         }
     }
 
-    @Application(\.logger) private var logger
-
-    @Dependency(Account.self) private var account: Account? // optional, as Firebase might be disabled
-    @Dependency(FirebaseAccountService.self) private var accountService: FirebaseAccountService?
-
-    init() {}
-
-    func userDocumentReference(for accountId: String) -> DocumentReference {
+    public init() {}
+    
+    public func userDocumentReference(for accountId: String) -> DocumentReference {
         Self.userCollection.document(accountId)
     }
 
-
-    func configure() {
+    public func configure() {
         Task {
             // await setupTestAccount()
         }
     }
-
-
 //    private func setupTestAccount() async {
 //        guard let accountService, FeatureFlags.setupTestAccount else {
 //            return
