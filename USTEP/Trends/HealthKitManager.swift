@@ -43,25 +43,29 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
     @Published public var averageSteps: Double = 0.0
     private var refreshTimer: Timer?
     
-    @MainActor static let shared = HealthKitManager()
-    
     private let healthStore = HKHealthStore()
     private let queue = DispatchQueue(label: "healthdataqueue", attributes: .concurrent)
     
     private var account: Account?
-    private var config: FirebaseConfiguration?
-    
     private var isConfigured = false
     private var initializationTask: Task<Void, Never>?
     
-    public init() {
-
+    public init() {}
+    
+    public func configure(account: Account?) {
+        self.account = account
     }
     
-    // Method to inject dependencies after Spezi initialization
-    public func configure(account: Account?, config: FirebaseConfiguration) {
-        self.account = account
-        self.config = config
+    @MainActor
+    private func getUserDocumentReference() -> DocumentReference? {
+        guard let account = self.account,
+              account.signedIn,
+              let accountId = account.details?.accountId else {
+            print("❌ No signed-in account available")
+            return nil
+        }
+        
+        return Firestore.firestore().collection("users").document(accountId)
     }
     
     private func ensureConfigured() async {
@@ -91,7 +95,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
         }
     }
     
-    // Adding a method to manually start configuration when Spezi is ready
     public func startConfiguration() {
         guard !isConfigured else { return }
         Task {
@@ -117,7 +120,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
         }
     }
     
-    // This funciton fetches Distance data mainly to show the data for last 7 days
     public func fetchDistanceData() async {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         
@@ -157,7 +159,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
                 }
             }
             
-            // Making arrays immutable before passing to MainActor
             let finalDistanceData = tempDistanceData
             let finalTotalDistance = tempTotalDistance
             let finalAverageDistance = finalDistanceData.isEmpty ? 0 : finalTotalDistance / Double(finalDistanceData.count)
@@ -171,7 +172,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
         healthStore.execute(distanceQuery)
     }
     
-    // This funciton fetches Step data mainly to show the data for last 7 days
     public func fetchStepData() async {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         
@@ -212,7 +212,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
                 }
             }
             
-            // Making variables immutable before passing
             let finalStepData = tempStepData
             let finalTotalSteps = tempTotalSteps
             
@@ -241,7 +240,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
         case configurationNotAvailable
     }
     
-    // We use this function to check for data and send data based of our firebase
     public func fetchStepData(from startDate: Date, to endDate: Date) async throws -> [StepData] {
         guard HKHealthStore.isHealthDataAvailable() else {
             return []
@@ -305,13 +303,8 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
     }
     
     private func performStepCountUpload() async -> Bool {
-        guard let config = self.config else {
-            print("Firebase configuration not available - dependencies not injected yet.")
-            return false
-        }
-        
-        guard let userDocRef = try? await config.userDocumentReference else {
-            print("User document reference not available - Firebase may not be configured.")
+        guard let userDocRef = await getUserDocumentReference() else {
+            print("User document reference not available")
             return false
         }
         
@@ -417,19 +410,16 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
     
     @MainActor
     private func uploadStepCountData(stepData: [StepData], date: String, completion: @escaping (Bool) -> Void) {
-        guard let config = self.config else {
+        guard let userDocRef = getUserDocumentReference() else {
             completion(false)
             return
         }
         
-        guard let docRef = try? config.userDocumentReference.collection("stepCountData").document(date) else {
-            completion(false)
-            return
-        }
-        
+        let docRef = userDocRef.collection("stepCountData").document(date)
         let filtered = stepData.filter { $0.date == date }
         let total = filtered.reduce(0) { $0 + $1.steps }
         let timestamp = Timestamp(date: Date())
+        
         docRef.getDocument { (document, error) in
             if let document = document, document.exists {
                 docRef.updateData([
@@ -458,7 +448,7 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
                                            from startDateString: String,
                                            to endDateString: String,
                                            completion: @escaping (Bool) -> Void) {
-        guard let config = self.config else {
+        guard let userDocRef = getUserDocumentReference() else {
             completion(false)
             return
         }
@@ -481,13 +471,8 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
             let dayData = stepData.filter { $0.date == dateStr }
             let steps = dayData.reduce(0) { $0 + $1.steps }
             
-            let docRef = try? config.userDocumentReference.collection("stepCountData").document(dateStr)
+            let docRef = userDocRef.collection("stepCountData").document(dateStr)
             let timestamp = Timestamp(date: Date())
-            
-            guard let docRef = docRef else {
-                current = Calendar.current.date(byAdding: .day, value: 1, to: current)!
-                continue
-            }
             
             group.enter()
             docRef.getDocument { doc, err in
@@ -528,9 +513,7 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
             completion(allSuccess)
         }
     }
-    
 
-    // We use this function to check for data and send data based of our firebase
     public func fetchDistanceData(from startDate: Date, to endDate: Date) async throws -> [DistanceData] {
         guard HKHealthStore.isHealthDataAvailable() else {
             return []
@@ -592,51 +575,45 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
             completion(result)
         }
     }
-    
+
     nonisolated private func performDistanceDataUpload() async -> Bool {
-        guard let config = self.config else {
-            print("Firebase configuration not available - dependencies not injected yet.")
+        guard let userDocRef = await getUserDocumentReference() else {
+            print("Firebase configuration not available")
             return false
         }
         
-        do {
-            let userDocRef = try await config.userDocumentReference
-            let distanceDataCollection = userDocRef.collection("distanceData")
-            
-            let documentResult = await withCheckedContinuation { (continuation: CheckedContinuation<DocumentSnapshot?, Never>) in
-                userDocRef.getDocument { document, error in
-                    if let error = error {
-                        print("Error fetching user document: \(error)")
-                        continuation.resume(returning: nil)
-                        return
-                    }
-                    continuation.resume(returning: document)
+        let distanceDataCollection = userDocRef.collection("distanceData")
+        
+        let documentResult = await withCheckedContinuation { (continuation: CheckedContinuation<DocumentSnapshot?, Never>) in
+            userDocRef.getDocument { document, error in
+                if let error = error {
+                    print("Error fetching user document: \(error)")
+                    continuation.resume(returning: nil)
+                    return
                 }
+                continuation.resume(returning: document)
             }
-            
-            guard let document = documentResult,
-                  document.exists,
-                  let dateJoinedTimestamp = document.get("dateJoined") as? Timestamp else {
-                return false
-            }
-            
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd"
-            let dateJoined = dateJoinedTimestamp.dateValue()
-            let todayDateString = dateFormatter.string(from: Date())
-            
-            let queryResult = await getLatestDistanceDataAsync(distanceDataCollection)
-            let lastUpdatedDate = getLastUpdatedDateForDistance(queryResult: queryResult,
-                                                                dateJoined: dateJoined,
-                                                                dateFormatter: dateFormatter)
-            
-            return await processDistanceDataUpload(lastUpdatedDate: lastUpdatedDate,
-                                                   todayDateString: todayDateString,
-                                                   dateFormatter: dateFormatter)
-        } catch {
-            print("User document reference not available - Firebase may not be configured.")
+        }
+        
+        guard let document = documentResult,
+              document.exists,
+              let dateJoinedTimestamp = document.get("dateJoined") as? Timestamp else {
             return false
         }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateJoined = dateJoinedTimestamp.dateValue()
+        let todayDateString = dateFormatter.string(from: Date())
+        
+        let queryResult = await getLatestDistanceDataAsync(distanceDataCollection)
+        let lastUpdatedDate = getLastUpdatedDateForDistance(queryResult: queryResult,
+                                                            dateJoined: dateJoined,
+                                                            dateFormatter: dateFormatter)
+        
+        return await processDistanceDataUpload(lastUpdatedDate: lastUpdatedDate,
+                                               todayDateString: todayDateString,
+                                               dateFormatter: dateFormatter)
     }
     
     private func getLatestDistanceDataAsync(_ distanceDataCollection: CollectionReference) async -> QuerySnapshot? {
@@ -737,17 +714,12 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
     
     @MainActor
     private func uploadDistanceData(distanceData: [DistanceData], date: String, completion: @escaping (Bool) -> Void) {
-        guard let config = self.config else {
+        guard let userDocRef = getUserDocumentReference() else {
             completion(false)
             return
         }
         
-        guard let docRef = try? config.userDocumentReference else {
-            completion(false)
-            return
-        }
-        
-        let distanceRef = docRef.collection("distanceData").document(date)
+        let distanceRef = userDocRef.collection("distanceData").document(date)
         let total = distanceData.filter { $0.date == date }.reduce(0.0) { $0 + $1.distance }
         let lastUpdated = Timestamp(date: Date())
         
@@ -780,7 +752,7 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
                                                from start: String,
                                                to end: String,
                                                completion: @escaping (Bool) -> Void) {
-        guard let config = self.config else {
+        guard let userDocRef = getUserDocumentReference() else {
             completion(false)
             return
         }
@@ -810,14 +782,13 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
                 "lastUpdatedAt": Timestamp(date: Date())
             ]
             
-            if let docRef = try? config.userDocumentReference.collection("distanceData").document(dateStr) {
-                group.enter()
-                docRef.setData(payload, merge: true) { err in
-                    if err != nil {
-                        allSuccess = false
-                    }
-                    group.leave()
+            let docRef = userDocRef.collection("distanceData").document(dateStr)
+            group.enter()
+            docRef.setData(payload, merge: true) { err in
+                if err != nil {
+                    allSuccess = false
                 }
+                group.leave()
             }
             
             current = Calendar.current.date(byAdding: .day, value: 1, to: current)!
@@ -827,17 +798,12 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
             completion(allSuccess)
         }
     }
-    // Only syncs data for existing users - does NOT create new users
+    
     public func enhancedSmartSync(completion: @escaping @Sendable (Bool) -> Void) {
         Task {
             await ensureConfigured()
             
-            guard let config = self.config else {
-                completion(false)
-                return
-            }
-            
-            guard let userDocRef = try? await config.userDocumentReference else {
+            guard let userDocRef = await getUserDocumentReference() else {
                 completion(false)
                 return
             }
@@ -888,7 +854,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
         }
     }
     
-    // This function set DateJoined and Add All Data (for existing users without dateJoined)
     private func setDateJoinedAndAddAllData(userDocRef: DocumentReference) async -> Bool {
         let today = Date()
         let updated = await withCheckedContinuation { continuation in
@@ -920,7 +885,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
         
         let allSuccess = stepSuccess && distanceSuccess
         
-        // Update main user document's lastUpdated
         if allSuccess {
             await updateLastUpdatedTimestamp(userDocRef: userDocRef)
         }
@@ -931,7 +895,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
     private func syncStepDataCollection(userDocRef: DocumentReference, dateJoined: Date, todayDateString: String, dateFormatter: DateFormatter) async -> Bool {
         let stepCountCollection = userDocRef.collection("stepCountData")
         
-        // Check if there's any data in stepCountData collection
         let lastUpdatedDate: Date? = await withCheckedContinuation { (continuation: CheckedContinuation<Date?, Never>) in
             stepCountCollection.order(by: "date", descending: true).limit(to: 1).getDocuments { querySnapshot, error in
                 if let error = error {
@@ -964,7 +927,6 @@ public final class HealthKitManager: @unchecked Sendable, ObservableObject {
             if lastUpdatedDate == dateFormatter.date(from: todayDateString) {
                 return await uploadStepCountData(userDocRef: userDocRef, stepData: stepData, date: todayDateString)
             } else {
-                // If last updated date is not today, update previous days and then today's data
                 let firstUpload = await uploadStepCountData(userDocRef: userDocRef, stepData: stepData, date: dateFormatter.string(from: lastUpdatedDate))
                 
                 if !firstUpload {

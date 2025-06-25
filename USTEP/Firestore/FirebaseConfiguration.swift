@@ -71,6 +71,8 @@ public final class FirebaseConfiguration: Module, DefaultInitializable, Observab
     public enum ConfigurationError: Error {
         case userNotAuthenticatedYet
     }
+    
+    @Dependency(Account.self) private var account
 
     public static var userCollection: CollectionReference {
         Firestore.firestore().collection("users")
@@ -88,13 +90,9 @@ public final class FirebaseConfiguration: Module, DefaultInitializable, Observab
         Firestore.firestore().collection("veinessurveys")
     }
 
-    // Store references to dependencies - will be set after Spezi initialization
-    private var account: Account?
-    private var accountService: FirebaseAccountService?
-
     @MainActor var userDocumentReference: DocumentReference {
         get throws {
-            guard let details = account?.details else {
+            guard let details = account.details else {
                 throw ConfigurationError.userNotAuthenticatedYet
             }
 
@@ -104,7 +102,7 @@ public final class FirebaseConfiguration: Module, DefaultInitializable, Observab
 
     @MainActor var userBucketReference: StorageReference {
         get throws {
-            guard let details = account?.details else {
+            guard let details = account.details else {
                 throw ConfigurationError.userNotAuthenticatedYet
             }
 
@@ -114,7 +112,7 @@ public final class FirebaseConfiguration: Module, DefaultInitializable, Observab
     
     @MainActor var userID: String {
         get throws {
-            guard let details = account?.details else {
+            guard let details = account.details else {
                 throw ConfigurationError.userNotAuthenticatedYet
             }
 
@@ -123,13 +121,7 @@ public final class FirebaseConfiguration: Module, DefaultInitializable, Observab
     }
 
     public init() {}
-
-    // Method to inject dependencies after Spezi initialization
-    public func configure(account: Account?, accountService: FirebaseAccountService?) {
-        self.account = account
-        self.accountService = accountService
-    }
-
+    
     public func userDocumentReference(for accountId: String) -> DocumentReference {
         Self.userCollection.document(accountId)
     }

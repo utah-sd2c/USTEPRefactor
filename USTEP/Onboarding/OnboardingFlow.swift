@@ -93,19 +93,24 @@ struct OnboardingFlow: View {
     @AppStorage("isSigningUp") private var isSigningUp = true
     @State private var localNotificationAuthorization = false
     @State private var healthKitAuthorizationStatus = false
+    @State private var hasSelectedDisease = false
+    @State private var isCheckingDiseaseStatus = true
     
     var body: some View {
         OnboardingStack(onboardingFlowComplete: $completedOnboardingFlow) {
             Welcome()
             AccountSetupHeader()
             
-            // Our logic will decide which view to show
             Consent()
             UtahSignUp()
             UtahLogin()
             
             if !FeatureFlags.disableFirebase {
                 AccountOnboarding()
+            }
+            
+            if !hasSelectedDisease && !isCheckingDiseaseStatus {
+                ConditionQuestion()
             }
             
             if HKHealthStore.isHealthDataAvailable() && !healthKitAuthorizationStatus {
@@ -116,7 +121,6 @@ struct OnboardingFlow: View {
                 NotificationPermissions()
             }
         }
-        
         .interactiveDismissDisabled(!completedOnboardingFlow)
         .task {
             await updateHealthKitStatus()
@@ -126,7 +130,6 @@ struct OnboardingFlow: View {
             
             Task {
                 localNotificationAuthorization = await notificationSettings().authorizationStatus == .authorized
-                
                 await updateHealthKitStatus()
                 
                 await MainActor.run {
@@ -134,10 +137,8 @@ struct OnboardingFlow: View {
                         completedOnboardingFlow = true
                     }
                 }
-                
             }
         }
-        // Adding this to complete onboarding when conditions are met
         .onChange(of: localNotificationAuthorization) { _, authorized in
             if account.signedIn && authorized && healthKitAuthorizationStatus && !completedOnboardingFlow {
                 completedOnboardingFlow = true
@@ -145,26 +146,19 @@ struct OnboardingFlow: View {
         }
         .onChange(of: account.signedIn) { _, signedIn in
             if signedIn {
-                print("🚀 User signed in, checking if user document exists...")
+                checkDiseaseStatus()
                 
-                // Try Spezi Account first
                 if let details = account.details {
                     let userDocRef = Firestore.firestore().collection("users").document(details.accountId)
-                    
-                    // Check if document already exists
                     userDocRef.getDocument { document, error in
                         if let error = error {
-                            print("❌ Error checking user document: \(error)")
                             return
                         }
                         
                         if let document = document, document.exists {
-                            print("ℹ️ User document already exists, skipping creation")
                             return
                         }
                         
-                        // Document doesn't exist, create it
-                        print("📝 Creating new user document...")
                         let userData: [String: Any] = [
                             "firstName": details.name?.givenName ?? "",
                             "lastName": details.name?.familyName ?? "",
@@ -172,32 +166,20 @@ struct OnboardingFlow: View {
                             "dateJoined": Timestamp(date: Date())
                         ]
                         
-                        userDocRef.setData(userData) { error in
-                            if let error = error {
-                                print("❌ User document creation failed: \(error)")
-                            } else {
-                                print("✅ User document created successfully!")
-                            }
-                        }
+                        userDocRef.setData(userData)
                     }
                 } else if let user = Auth.auth().currentUser {
-                    // Fallback to Firebase Auth
                     let userDocRef = Firestore.firestore().collection("users").document(user.uid)
                     
-                    // Check if document already exists
                     userDocRef.getDocument { document, error in
                         if let error = error {
-                            print("❌ Error checking Firebase user document: \(error)")
                             return
                         }
                         
                         if let document = document, document.exists {
-                            print("ℹ️ Firebase user document already exists, skipping creation")
                             return
                         }
                         
-                        // Document doesn't exist, create it
-                        print("📝 Creating new Firebase user document...")
                         let fullName = user.displayName?.components(separatedBy: " ") ?? []
                         let userData: [String: Any] = [
                             "firstName": fullName.first ?? "",
@@ -206,15 +188,31 @@ struct OnboardingFlow: View {
                             "dateJoined": Timestamp(date: Date())
                         ]
                         
-                        userDocRef.setData(userData) { error in
-                            if let error = error {
-                                print("❌ Firebase user document creation failed: \(error)")
-                            } else {
-                                print("✅ Firebase user document created successfully!")
-                            }
-                        }
+                        userDocRef.setData(userData)
                     }
                 }
+            }
+        }
+    }
+    
+    // New function to check if the User has already selected a disease
+    private func checkDiseaseStatus() {
+        guard let details = account.details else { return }
+        
+        isCheckingDiseaseStatus = true
+        let userDocRef = Firestore.firestore().collection("users").document(details.accountId)
+        
+        userDocRef.getDocument { document, error in
+            DispatchQueue.main.async {
+                if let document = document,
+                   document.exists,
+                   let disease = document.get("disease") as? String,
+                   !disease.isEmpty && disease != "Choose Diagnosis" {
+                    hasSelectedDisease = true
+                } else {
+                    hasSelectedDisease = false
+                }
+                isCheckingDiseaseStatus = false
             }
         }
     }

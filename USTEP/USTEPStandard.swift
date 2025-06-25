@@ -32,6 +32,7 @@ actor USTEPStandard: Standard,
 
     @Dependency(FirebaseConfiguration.self) private var configuration
 
+
     enum SurveyType {
         case edmonton
         case wiq
@@ -183,6 +184,7 @@ actor USTEPStandard: Standard,
         var userID: String = "PATIENT_ID"
         do {
             userID = try await configuration.userID
+            await logger.debug("Successfully got user ID: \(userID)")
         } catch {
             await logger.error("Could not get logged in user's ID: \(error)")
         }
