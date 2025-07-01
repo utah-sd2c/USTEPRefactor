@@ -21,6 +21,7 @@ import FirebaseFirestore
 import Foundation
 import SpeziAccount
 import SwiftUI
+import ModelsR4
 
 
 @MainActor public class FirestoreManager: ObservableObject {
@@ -33,7 +34,7 @@ import SwiftUI
     @Published public var latestSixMinuteWalkTestResult: (date: Date, distance: Double, steps: Int,
                                                           restCount: Int, restData: [String: [String: Any]]) = (Date(), 0, 0, 0, [:])
     @Published public var surveys = [:] as [String: [(dateCompleted: Date, score: Int, surveyId: String)]]
-    // @Published public var surveys: [QuestionnaireResponse] = []
+//     @Published public var surveys: [QuestionnaireResponse] = []
     
     var refresh = false
     

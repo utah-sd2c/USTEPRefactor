@@ -34,7 +34,7 @@ struct UserInformationView: View {
                    backgroundColor: Color(.white)
                )
                .sheet(isPresented: $surveyHistory) {
-   //                SurveyHistoryList()
+                   SurveyHistoryList()
                }
                .padding(.bottom, -15)
                
