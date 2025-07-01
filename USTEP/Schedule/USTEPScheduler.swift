@@ -31,11 +31,11 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
     func configure() {
         do {
             try scheduler.createOrUpdateTask(
-                id: "social-support-questionnaire",
-                title: "Social Support Questionnaire",
-                instructions: "Please fill out the Social Support Questionnaire every day.",
+                id: "assessment-bundle-questionnaire",
+                title: "Assessment Bundle",
+                instructions: "Please complete this task once a month.",
                 category: .questionnaire,
-                schedule: .daily(hour: 8, minute: 0, startingAt: .today)
+                schedule: .daily(/*interval: 30, */hour: 8, minute: 0, startingAt: .today)
             ) { context in
                 var stepsToInsert: CodableORKStepsDict = .init()
                 let step0: CodableORKStep = .init(
