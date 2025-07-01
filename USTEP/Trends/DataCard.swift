@@ -33,100 +33,150 @@ struct DataCard: View {
     @State private var averageSteps: Double = 0.0
     
 
- var body: some View {
-     VStack(alignment: .center) {
-         // title
-         HStack(alignment: .firstTextBaseline) {
-             Image(systemName: icon)
-             Text(title)
-                 .font(.headline)
-         }
-         .padding(.bottom, 2)
-
-         // data content based on title
-         metricContentView
-     }
-     .padding(30)
-     .background {
-         RoundedRectangle(cornerRadius: 10)
-             .foregroundColor(Color(.systemBackground))
-             .shadow(radius: 5)
-     }
-     .task {
-         if title == "Average Step Count" {
-              await firestoreManager.loadObservations(metricCode: "55423-8")
-              recalculateChartData(basedon: firestoreManager.observations)
-              await getAverageStepData()
-         } else if title == "Average Distance Traveled" {
-              await getAverageDistanceData()
-         }
-     }
- }
-    @ViewBuilder
-    private var metricContentView: some View {
-        if title == "Average Distance Traveled" {
+    var body: some View {
+        VStack(alignment: .center) {
+            // title
             HStack(alignment: .firstTextBaseline) {
-                Spacer()
-                Text(String(format: "%.2f", averageDistance))
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(color)
-                    .accessibility(identifier: "\(unit)_val")
-                Text("miles")
-                Spacer()
-                Image(systemName: "chevron.up")
+                Image(systemName: icon)
+                Text(title)
+                    .font(.headline)
             }
-            .onAppear {
-                Task {
-                     await getAverageDistanceData()
+            .padding(.bottom, 2)
+            // data
+            
+            if title == "Six Minute Walk Test" {
+                VStack {
+                    HStack(alignment: .firstTextBaseline) {
+                        Spacer()
+                        VStack {
+                            Text(String(format: "%.2f", convertToMiles(meters: distance)))
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(color)
+                                .accessibility(identifier: "\(unit)_val")
+                            Text(unit)
+                        }
+                        Spacer()
+                        VStack {
+                            Text("\(steps)")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(color)
+                                .accessibility(identifier: "steps_val")
+                            Text("steps")
+                        }
+                        Spacer()
+                        VStack {
+                            Text("\(restCount)")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(color)
+                                .accessibility(identifier: "rest_val")
+                            Text("rests")
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.up")
+                    }
+                }
+                .onAppear {
+                    Task {
+//                        await getSixMinuteWalkTestData()
+                    }
+                }
+                
+            } else if title == "Average Distance Traveled" {
+                HStack(alignment: .firstTextBaseline) {
+                    Spacer()
+                    Text(String(format: "%.2f", averageDistance))
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(color)
+                        .accessibility(identifier: "\(unit)_val")
+                    Text("miles") // Change "mi" to "miles"
+                    Spacer()
+                    Image(systemName: "chevron.up")
+                }
+            
+                .onAppear {
+                    Task {
+                        await getAverageDistanceData()
+                    }
+                }
+        }
+            else if title == "Average Step Count" {
+                HStack(alignment: .firstTextBaseline) {
+                    Spacer()
+                    Text(String(format: "%.0f", averageSteps))
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(color)
+                        .accessibility(identifier: "\(unit)_val")
+                    Text("steps")
+                    Spacer()
+                    Image(systemName: "chevron.up")
+                }
+                .onAppear {
+                    Task {
+                        await getAverageStepData()
+                    }
                 }
             }
-
-        } else if title == "Average Step Count" {
-            HStack(alignment: .firstTextBaseline) {
-                Spacer()
-                Text(String(format: "%.0f", averageSteps))
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(color)
-                    .accessibility(identifier: "\(unit)_val")
-                Text("steps")
-                Spacer()
-                Image(systemName: "chevron.up")
-            }
-            .onAppear {
-                Task {
-                     await getAverageStepData()
+                else {
+                HStack(alignment: .firstTextBaseline) {
+                    Spacer()
+                    Text(Int(maxValue).description)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(color)
+                        .accessibility(identifier: "\(unit)_val")
+                    Text(unit)
+                    Spacer()
+                    Image(systemName: "chevron.up")
                 }
             }
-
-        } else {
-            HStack(alignment: .firstTextBaseline) {
-                Spacer()
-                Text(Int(maxValue).description)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(color)
-                    .accessibility(identifier: "\(unit)_val")
-                Text(unit)
-                Spacer()
-                Image(systemName: "chevron.up")
+        }
+        .padding(30)
+        .frame(width: 350, height: title == "Six Minute Walk Test" ? 130 : 110) // Adjust the height for the "Six Minute Walk Test"
+        .background {
+            RoundedRectangle(cornerRadius: 10)
+                .foregroundColor(Color(.systemBackground))
+                .shadow(radius: 5)
+        }
+        .task {
+            if title == "Average Step Count" {
+//                await firestoreManager.loadObservations(metricCode: "55423-8")
+//                recalculateChartData(basedon: firestoreManager.observations)
+                await getAverageStepData()
+            }
+            else if title == "Latest EFS Score" {
+                await firestoreManager.loadSurveys()
+                getSurveyData(surveyType: "edmonton")
+            } else if title == "Veines Survey Score" {
+                await firestoreManager.loadSurveys()
+                getSurveyData(surveyType: "veines")
+            } else if title == "WIQ Survey Score" {
+                await firestoreManager.loadSurveys()
+                getSurveyData(surveyType: "wiq")
+            }else if title == "Six Minute Walk Test" {
+//                await getSixMinuteWalkTestData()
+            }
+            else if title == "Average Distance Traveled" {
+                await getAverageDistanceData()
             }
         }
     }
-
     // swiftlint:enable closure_body_length
     private func convertToMiles(meters: Double) -> Double {
         return meters * 0.000621371
     }
-//    func getSurveyData(surveyType: String) {
-//        let data = firestoreManager.surveys[surveyType]
-//        // get the most reason data
-//        let mostRecentSurvey: (dateCompleted: Date, score: Int, surveyId: String)? = data?.sorted(by: { $0.dateCompleted > $1.dateCompleted }).first
-//        let score = mostRecentSurvey?.score ?? 0
-//        self.maxValue = Double(score)
-//    }
-    
+    func getSurveyData(surveyType: String) {
+        let data = firestoreManager.surveys[surveyType]
+        // get the most reason data
+        let mostRecentSurvey: (dateCompleted: Date, score: Int, surveyId: String)? = data?.sorted(by: { $0.dateCompleted > $1.dateCompleted }).first
+        let score = mostRecentSurvey?.score ?? 0
+        self.maxValue = Double(score)
+    }
+
     // Gets the Average Distance data from the healthkitmanager file
     func getAverageDistanceData() async {
           await healthKitManager.fetchDistanceData()

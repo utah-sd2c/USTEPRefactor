@@ -17,6 +17,7 @@ struct FormView: View {
     @EnvironmentObject var firestoreManager: FirestoreManager
     @Binding var disease: String
     @Binding var isEditing: Bool
+
     var body: some View {
         NavigationView {
             Form {
@@ -28,22 +29,13 @@ struct FormView: View {
                     }
                     .padding(.vertical, 10)
                 }
-                
-                Button(action: {
-                    saveDisease()
-                }) {
-                    HStack {
-                        Spacer()
-                        Text("Save")
-                        Spacer()
-                    }
-                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
+                        saveDisease()
                         isEditing = false
                     }
                 }
