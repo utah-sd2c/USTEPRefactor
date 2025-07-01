@@ -1,5 +1,5 @@
 #
-# This source file is part of the Stanford Spezi Template Application open-source project
+# This source file is part of the USTEP based on the Stanford Spezi Template Application project
 #
 # SPDX-FileCopyrightText: 2023 Stanford University
 #
@@ -12,7 +12,7 @@
 .derivedData
 .build
 .docs
-!TemplateApplication.xcodeproj
+!USTEP.xcodeproj
 
 # IDE related folders
 .idea
@@ -30,7 +30,7 @@ xcuserdata/
 # Tests
 report.junit
 report.html
-TemplateApplication.xcresult
+USTEP.xcresult
 
 # Logs
 logs
@@ -45,4 +45,7 @@ firebase-debug.*.log*
 .firebase/
 
 # Swift Package List
-TemplateApplication/package-list.json
+USTEP/package-list.json
+
+# Firebase configuration
+USTEP/Supporting Files/GoogleService-Info.*

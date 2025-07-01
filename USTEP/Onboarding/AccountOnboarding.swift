@@ -1,0 +1,46 @@
+//
+// This source file is part of the USTEP based on the Stanford Spezi Template Application project
+//
+// SPDX-FileCopyrightText: 2023 Stanford University
+//
+// SPDX-License-Identifier: MIT
+//
+
+@_spi(TestingSupport) import SpeziAccount
+import SpeziOnboarding
+import SwiftUI
+
+
+struct AccountOnboarding: View {
+    @Environment(OnboardingNavigationPath.self) private var onboardingNavigationPath
+    
+    
+    var body: some View {
+        AccountSetup { _ in
+            Task {
+                // Placing the nextStep() call inside this task will ensure that the sheet dismiss animation is
+                // played till the end before we navigate to the next step.
+                onboardingNavigationPath.nextStep()
+            }
+        }  continue: {
+            OnboardingActionsView(
+                "Next",
+                action: {
+                    onboardingNavigationPath.nextStep()
+                }
+            )
+        }
+    }
+}
+
+
+#if DEBUG
+#Preview("Account Onboarding SignIn") {
+    OnboardingStack {
+        AccountOnboarding()
+    }
+        .previewWith {
+            AccountConfiguration(service: InMemoryAccountService())
+        }
+}
+#endif
