@@ -31,6 +31,7 @@ actor USTEPStandard: Standard,
     @Application(\.logger) private var logger
 
     @Dependency(FirebaseConfiguration.self) private var configuration
+    @Dependency(Account.self) private var account
 
 
     enum SurveyType {
@@ -88,6 +89,24 @@ actor USTEPStandard: Standard,
     }
 
     // periphery:ignore:parameters isolation
+//    func add(response: ModelsR4.QuestionnaireResponse, isolation: isolated (any Actor)? = #isolation) async {
+//        let id = response.identifier?.value?.value?.string ?? UUID().uuidString
+//        
+//        if FeatureFlags.disableFirebase {
+//            let jsonRepresentation = (try? String(data: JSONEncoder().encode(response), encoding: .utf8)) ?? ""
+//            await logger.debug("Received questionnaire response: \(jsonRepresentation)")
+//            return
+//        }
+//        
+//        do {
+//             try await configuration.userDocumentReference
+//                .collection("QuestionnaireResponse") // Add all HealthKit sources in a /QuestionnaireResponse collection.
+//                .document(id) // Set the document identifier to the id of the response.
+//                .setData(from: response)
+//        } catch {
+//            await logger.error("Could not store questionnaire response: \(error)")
+//        }
+//    }
     func add(response: ModelsR4.QuestionnaireResponse, isolation: isolated (any Actor)? = #isolation) async {
         let id = response.identifier?.value?.value?.string ?? UUID().uuidString
         
@@ -98,10 +117,18 @@ actor USTEPStandard: Standard,
         }
         
         do {
-            // try await configuration.userDocumentReference
-            //    .collection("QuestionnaireResponse") // Add all HealthKit sources in a /QuestionnaireResponse collection.
-            //    .document(id) // Set the document identifier to the id of the response.
-            //    .setData(from: response)
+            // Get user ID directly from account (like your other code)
+            guard let accountId = await account.details?.accountId else {
+                await logger.error("No authenticated user found")
+                return
+            }
+            
+            try await Firestore.firestore()
+                .collection("users")
+                .document(accountId)
+                .collection("QuestionnaireResponse")
+                .document(id)
+                .setData(from: response)
         } catch {
             await logger.error("Could not store questionnaire response: \(error)")
         }

@@ -104,47 +104,47 @@ public struct Trends: View {
                                                         .environmentObject(healthKitManager)
                     }
                     
-                    //                    Text("Questionnaires")
-                    //                        .font(.title)
-                    //                        .fontWeight(.bold)
-                    //                        .padding(.top, 10)
-                    //                        .padding(.bottom, 10)
-                    //                        .frame(maxWidth: .infinity, alignment: .leading)
-                    //                    ForEach(getKeys(dict: firestoreManager.surveys), id: \.self) { survey in
-                    //                        if survey == "edmonton"{
-                    //                            DataCard(
-                    //                                icon: "figure.run",
-                    //                                title: "Latest EFS Score",
-                    //                                unit: "points",
-                    //                                color: Color.blue
-                    //                            )
-                    //                            .padding(.vertical, 10)
-                    //                            .onTapGesture {
-                    //                                self.showEdmonton.toggle()
-                    //                            }
-                    //                            .sheet(isPresented: $showEdmonton) {
-                    //                                //                                        SurveyChart(title: "Edmonton Frail Scale", surveyType: "edmonton")
-                    //                            }
-                    //                        } else if survey == "veines" {
-                    //                            DataCard(icon: "list.clipboard.fill", title: "Veines Survey Score", unit: "points", color: Color.purple)
-                    //                                .padding(.vertical, 10)
-                    //                                .onTapGesture {
-                    //                                    self.showVeines.toggle()
-                    //                                }
-                    //                                .sheet(isPresented: $showVeines) {
-                    //                                    //                                            SurveyChart(title: "Veines Survey", surveyType: "veines")
-                    //                                }
-                    //                        } else if survey == "wiq" {
-                    //                            DataCard(icon: "figure.walk", title: "WIQ Survey Score", unit: "points", color: Color.red)
-                    //                                .padding(.vertical, 10)
-                    //                                .onTapGesture {
-                    //                                    self.showWIQ.toggle()
-                    //                                }
-                    //                                .sheet(isPresented: $showWIQ) {
-                    //                                    //                                            SurveyChart(title: "WIQ Survey", surveyType: "wiq")
-                    //                                }
-                    //                        }
-                    //                    }
+                                        Text("Questionnaires")
+                                            .font(.title)
+                                            .fontWeight(.bold)
+                                            .padding(.top, 10)
+                                            .padding(.bottom, 10)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        ForEach(getKeys(dict: firestoreManager.surveys), id: \.self) { survey in
+                                            if survey == "edmonton"{
+                                                DataCard(
+                                                    icon: "figure.run",
+                                                    title: "Latest EFS Score",
+                                                    unit: "points",
+                                                    color: Color.blue
+                                                )
+                                                .padding(.vertical, 10)
+                                                .onTapGesture {
+                                                    self.showEdmonton.toggle()
+                                                }
+                                                .sheet(isPresented: $showEdmonton) {
+                                                                                            SurveyChart(title: "Edmonton Frail Scale", surveyType: "edmonton")
+                                                }
+                                            } else if survey == "veines" {
+                                                DataCard(icon: "list.clipboard.fill", title: "Veines Survey Score", unit: "points", color: Color.purple)
+                                                    .padding(.vertical, 10)
+                                                    .onTapGesture {
+                                                        self.showVeines.toggle()
+                                                    }
+                                                    .sheet(isPresented: $showVeines) {
+                                                                                                    SurveyChart(title: "Veines Survey", surveyType: "veines")
+                                                    }
+                                            } else if survey == "wiq" {
+                                                DataCard(icon: "figure.walk", title: "WIQ Survey Score", unit: "points", color: Color.red)
+                                                    .padding(.vertical, 10)
+                                                    .onTapGesture {
+                                                        self.showWIQ.toggle()
+                                                    }
+                                                    .sheet(isPresented: $showWIQ) {
+                                                                                                    SurveyChart(title: "WIQ Survey", surveyType: "wiq")
+                                                    }
+                                            }
+                                        }
                     
                     Text("Six Minute Walk Test")
                         .font(.title)
