@@ -164,8 +164,8 @@ public struct Trends: View {
                     }
                     .sheet(isPresented: $showsixminutewalktestContentView) {
                         NavigationView {
-                            //                                        sixminutewalktestContentView()
-                            //                                            .environmentObject(firestoreManager)
+                                                                    sixminutewalktestContentView()
+                                                                        .environmentObject(firestoreManager)
                         }
                     }
                 } .padding(.horizontal)

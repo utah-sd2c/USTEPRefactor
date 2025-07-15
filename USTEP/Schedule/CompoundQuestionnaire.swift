@@ -50,7 +50,7 @@ public class CodableORKStep: Codable, Equatable {
             getUpAndGoStep.text = codableORKStep.text
             return getUpAndGoStep
         case .sixMWT:
-            let activeStep = ORKActiveStep(identifier: codableORKStep.id)
+            let activeStep = SixMinuteWalkStep(identifier: codableORKStep.id)
             activeStep.title = codableORKStep.title
             activeStep.text = codableORKStep.text
             return activeStep

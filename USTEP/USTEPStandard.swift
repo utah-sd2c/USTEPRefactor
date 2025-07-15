@@ -27,13 +27,13 @@ actor USTEPStandard: Standard,
                                    EnvironmentAccessible,
                                    HealthKitConstraint,
                                    ConsentConstraint,
-                                   AccountNotifyConstraint {
+                     AccountNotifyConstraint {
     @Application(\.logger) private var logger
-
+    
     @Dependency(FirebaseConfiguration.self) private var configuration
     @Dependency(Account.self) private var account
-
-
+    
+    
     enum SurveyType {
         case edmonton
         case wiq
@@ -59,8 +59,8 @@ actor USTEPStandard: Standard,
     ]
     
     init() {}
-
-
+    
+    
     func add(sample: HKSample) async {
         if FeatureFlags.disableFirebase {
             logger.debug("Received new HealthKit sample: \(sample)")
@@ -87,26 +87,26 @@ actor USTEPStandard: Standard,
             logger.error("Could not remove HealthKit sample: \(error)")
         }
     }
-
+    
     // periphery:ignore:parameters isolation
-//    func add(response: ModelsR4.QuestionnaireResponse, isolation: isolated (any Actor)? = #isolation) async {
-//        let id = response.identifier?.value?.value?.string ?? UUID().uuidString
-//        
-//        if FeatureFlags.disableFirebase {
-//            let jsonRepresentation = (try? String(data: JSONEncoder().encode(response), encoding: .utf8)) ?? ""
-//            await logger.debug("Received questionnaire response: \(jsonRepresentation)")
-//            return
-//        }
-//        
-//        do {
-//             try await configuration.userDocumentReference
-//                .collection("QuestionnaireResponse") // Add all HealthKit sources in a /QuestionnaireResponse collection.
-//                .document(id) // Set the document identifier to the id of the response.
-//                .setData(from: response)
-//        } catch {
-//            await logger.error("Could not store questionnaire response: \(error)")
-//        }
-//    }
+    //    func add(response: ModelsR4.QuestionnaireResponse, isolation: isolated (any Actor)? = #isolation) async {
+    //        let id = response.identifier?.value?.value?.string ?? UUID().uuidString
+    //
+    //        if FeatureFlags.disableFirebase {
+    //            let jsonRepresentation = (try? String(data: JSONEncoder().encode(response), encoding: .utf8)) ?? ""
+    //            await logger.debug("Received questionnaire response: \(jsonRepresentation)")
+    //            return
+    //        }
+    //
+    //        do {
+    //             try await configuration.userDocumentReference
+    //                .collection("QuestionnaireResponse") // Add all HealthKit sources in a /QuestionnaireResponse collection.
+    //                .document(id) // Set the document identifier to the id of the response.
+    //                .setData(from: response)
+    //        } catch {
+    //            await logger.error("Could not store questionnaire response: \(error)")
+    //        }
+    //    }
     func add(response: ModelsR4.QuestionnaireResponse, isolation: isolated (any Actor)? = #isolation) async {
         let id = response.identifier?.value?.value?.string ?? UUID().uuidString
         
@@ -147,7 +147,7 @@ actor USTEPStandard: Standard,
                    let firstAnswer = answer.answer?.first, // Get the first answer if it exists
                    let value = firstAnswer.value {
                     var answerScore: Int? = nil // Use optional for safer parsing
-
+                    
                     switch value {
                     case let .coding(codingData):
                         answerScore = Int(codingData.code?.value?.string ?? "")
@@ -168,20 +168,21 @@ actor USTEPStandard: Standard,
         return anyFound ? score : nil
     }
     
-    func submitByType(response: ModelsR4.QuestionnaireResponse,
-                          type: SurveyType,
-                          isolation: isolated (any Actor)? = #isolation) async {
+    func submitByType(
+        response: ModelsR4.QuestionnaireResponse,
+        type: SurveyType,
+        isolation: isolated (any Actor)? = #isolation
+    ) async {
         var score: Int = 0
-        if let surveyScore: Int = scoreByType(response: response, type: type) {
-            // We can process this request, as there is at least one question of the specified type
+        if let surveyScore = scoreByType(response: response, type: type) {
             score = surveyScore
         } else {
             await logger.log("Trying to submit data that does not exist")
             return
         }
-        
+
         let id = response.identifier?.value?.value?.string ?? UUID().uuidString
-        
+
         if FeatureFlags.disableFirebase {
             let jsonRepresentation = (try? String(data: JSONEncoder().encode(response), encoding: .utf8)) ?? ""
             await logger.debug("Received questionnaire response: \(jsonRepresentation)")
@@ -199,28 +200,14 @@ actor USTEPStandard: Standard,
             await logger.error("Error copying questionnaire response for processing: \(error)")
             return
         }
-        
-        
-        // Filter out any questions that don't start with the specified prefix
-        var indexesToRemove: [Int] = []
-        if let answers = copiedResponse.item {
-            for (ind, answer) in answers.enumerated() {
-                // Check if linkId is not nil and starts with the given prefix
-                if let linkIdString = answer.linkId.value?.string,
-                   let prefix = USTEPStandard.surveyPrefix[type],
-                   linkIdString.starts(with: prefix) {
-                    // We'll process this item
-                    // TODO: Get the URL, if any, from this and upload that file?
-                } else {
-                    // We won't process this item
-                    indexesToRemove.append(ind)
-                }
+
+        // Filter out questions not matching the prefix
+        if let prefix = USTEPStandard.surveyPrefix[type] {
+            copiedResponse.item = copiedResponse.item?.filter {
+                $0.linkId.value?.string.starts(with: prefix) == true
             }
         }
-        for ind in indexesToRemove.reversed() {
-            copiedResponse.item?.remove(at: ind)
-        }
-        
+
         var userID: String = "PATIENT_ID"
         do {
             userID = try await configuration.userID
@@ -228,24 +215,24 @@ actor USTEPStandard: Standard,
         } catch {
             await logger.error("Could not get logged in user's ID: \(error)")
         }
-        response.subject = Reference(reference: FHIRPrimitive(FHIRString("Patient/\(userID)")))
-        
-        let questionnaireName: String = USTEPStandard.surveyPrefix[type]?.lowercased() ?? "unknown"
+
+        copiedResponse.subject = Reference(reference: FHIRPrimitive(FHIRString("Patient/\(userID)")))
+        let questionnaireName = USTEPStandard.surveyPrefix[type]?.lowercased() ?? "unknown"
         copiedResponse.questionnaire = questionnaireName.asFHIRCanonicalPrimitive()
-        
-        // Create the summary that is stored in the user collection
+
         let summary: [String: Any] = [
             "score": score,
             "type": questionnaireName,
             "surveyId": id,
             "dateCompleted": Timestamp()
-        ] as [String: Any]
-        
+        ]
+
         do {
             try await configuration.userDocumentReference
-                .collection("QuestionnaireResponse") // Add all HealthKit sources in a /QuestionnaireResponse collection.
-                .document(id) // Set the document identifier to the id of the response.
+                .collection("QuestionnaireResponse")
+                .document(id)
                 .setData(summary)
+
             if let collection = USTEPStandard.surveyCollection[type] {
                 try await collection
                     .document(id)
@@ -256,10 +243,66 @@ actor USTEPStandard: Standard,
         } catch {
             await logger.error("Could not store questionnaire response: \(error)")
         }
-        
-        // TODO: Upload the clock draw as well
+
+        // Handle file upload for .edmonton type (synchronously)
+        if type == .edmonton, let responseItems = copiedResponse.item {
+            for item in responseItems {
+                if let answer = item.answer?.first,
+                   case let .attachment(attachment) = answer.value,
+                   let fileURL = attachment.url?.value?.url {
+
+                    do {
+                        let docRef = Firestore.firestore()
+                                           .collection("users")
+                                           .document(userID)
+                                           .collection("QuestionnaireResponse")
+                                           .document(id)
+
+                                       let snapshot = try await docRef.getDocument()
+                                       if let data = snapshot.data(), data["attachmentURL"] != nil {
+                                           print("Attachment already exists, skipping upload.")
+                                           break
+                                       }
+                        let storageRef = Storage.storage().reference()
+                        let timestamp = Int(Date().timeIntervalSince1970)
+                        let fileName = "edmonton-\(timestamp).heif"
+                        let storagePath = "users/\(userID)/edmonton/\(fileName)"
+                        let fileRef = storageRef.child(storagePath)
+
+                        // Upload file (awaited)
+                        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                            let uploadTask = fileRef.putFile(from: fileURL, metadata: nil)
+                            uploadTask.observe(.success) { _ in
+                                continuation.resume(returning: ())
+                            }
+                            uploadTask.observe(.failure) { snapshot in
+                                continuation.resume(throwing: snapshot.error ?? NSError(domain: "UploadError", code: -1))
+                            }
+                        }
+
+                        // Get download URL
+                        let downloadURL = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<URL, Error>) in
+                            fileRef.downloadURL { url, error in
+                                if let url = url {
+                                    continuation.resume(returning: url)
+                                } else {
+                                    continuation.resume(throwing: error ?? NSError(domain: "DownloadURLError", code: -1))
+                                }
+                            }
+                        }
+                    } catch {
+                        await logger.error("Upload or Firestore update failed: \(error)")
+                    }
+
+                    break // Only process first attachment
+                }
+            }
+        }
     }
-    
+
+
+
+
     private func healthKitDocument(id uuid: UUID) async throws -> FirebaseFirestore.DocumentReference {
         try await configuration.userDocumentReference
             .collection("HealthKit") // Add all HealthKit sources in a /HealthKit collection.

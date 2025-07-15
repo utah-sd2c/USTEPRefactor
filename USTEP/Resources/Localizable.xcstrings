@@ -7,10 +7,23 @@
     "%@ Score" : {
 
     },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
 
     },
     "+1 (801) 587-1450" : {
+
+    },
+    "6MWT Results" : {
 
     },
     "ACCOUNT_SETUP_DESCRIPTION" : {
@@ -220,6 +233,9 @@
       }
     },
     "Date" : {
+
+    },
+    "Date: %@" : {
 
     },
     "Diagnosis" : {
