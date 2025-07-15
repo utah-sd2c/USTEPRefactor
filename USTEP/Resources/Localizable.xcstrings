@@ -123,6 +123,9 @@
     "App Icon" : {
 
     },
+    "Assessment Bundle" : {
+
+    },
     "Change your diagnosis" : {
 
     },
@@ -697,10 +700,14 @@
         }
       }
     },
+    "Please complete this task once a month." : {
+
+    },
     "Please consult your doctor if you are unsure." : {
 
     },
     "Please fill out the Social Support Questionnaire every day." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -800,6 +807,7 @@
 
     },
     "Social Support Questionnaire" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
