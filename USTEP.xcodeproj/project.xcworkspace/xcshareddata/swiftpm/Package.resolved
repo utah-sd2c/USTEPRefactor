@@ -168,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jpsim/SourceKitten.git",
       "state" : {
-        "revision" : "fd4df99170f5e9d7cf9aa8312aa8506e0e7a44e7",
-        "version" : "0.35.0"
+        "revision" : "453f75b8a3bb2c3596c0d2dd422c289788233a22",
+        "version" : "0.37.1"
       }
     },
     {
@@ -186,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/StanfordSpezi/SpeziAccount.git",
       "state" : {
-        "revision" : "f2e30f91c124fd3f9fed692684d6efcd227389e2",
-        "version" : "2.1.4"
+        "revision" : "9bb3d277f7f0e7f2e5abbe22040fd8fd626042f0",
+        "version" : "2.1.6"
       }
     },
     {
@@ -213,8 +213,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/StanfordSpezi/SpeziFoundation.git",
       "state" : {
-        "revision" : "c844b98242829fe44e7908739374d4c8b88d6da7",
-        "version" : "2.1.0"
+        "revision" : "5ff5164e9d3001185d4fa00a97b92b053f363dbe",
+        "version" : "2.1.6"
       }
     },
     {
@@ -240,8 +240,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/StanfordSpezi/SpeziNotifications.git",
       "state" : {
-        "revision" : "b886f192282a925f600ec5ecbc94acfc75460293",
-        "version" : "1.0.3"
+        "revision" : "4a9ff11f41a0d3d3cf70e4696dbf604afe4330e6",
+        "version" : "1.0.6"
       }
     },
     {
@@ -267,8 +267,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/StanfordSpezi/SpeziScheduler.git",
       "state" : {
-        "revision" : "d2059174c05b25ae284f26288154b7d2dd46e44c",
-        "version" : "1.1.2"
+        "revision" : "e135f8a5f24fc923f5018f242c6beabbb36c64ff",
+        "version" : "1.2.6"
       }
     },
     {
@@ -285,8 +285,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/StanfordSpezi/SpeziViews.git",
       "state" : {
-        "revision" : "93e7b564866438b00db3833152a19548f54b8c58",
-        "version" : "1.9.2"
+        "revision" : "10b125763d8dd83c3fc9f9d6cd3137c8529212ce",
+        "version" : "1.10.1"
       }
     },
     {
@@ -357,8 +357,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "cb53fa1bd3219b0b23ded7dfdd3b2baff266fd25",
-        "version" : "600.0.0"
+        "revision" : "1103c45ece4f7fe160b8f75b4ea1ee2e5fac1841",
+        "version" : "601.0.0"
       }
     },
     {
@@ -366,8 +366,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/realm/SwiftLint.git",
       "state" : {
-        "revision" : "eba420f77846e93beb98d516b225abeb2fef4ca2",
-        "version" : "0.58.2"
+        "revision" : "625792423014cc49b0a1e5a1a5c0d6b8b3de10f9",
+        "version" : "0.59.1"
       }
     },
     {
