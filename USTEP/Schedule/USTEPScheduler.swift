@@ -32,9 +32,14 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
             try scheduler.createOrUpdateTask(
                 id: "social-support-questionnaire",
                 title: "Social Support Questionnaire",
-                instructions: "Please fill out the Social Support Questionnaire every day.",
+                instructions: "Please fill out the Social Support Questionnaire every 4 weeks.",
                 category: .questionnaire,
-                schedule: .daily(hour: 8, minute: 0, startingAt: .today)
+                schedule: .weekly(
+                         interval: 4,
+                         hour: 8,
+                         minute: 0,
+                         startingAt: .today
+                )
             ) { context in
                 var stepsToInsert: CodableORKStepsDict = .init()
                 let step0: CodableORKStep = .init(
@@ -120,12 +125,24 @@ final class USTEPScheduler: Module, DefaultInitializable, EnvironmentAccessible 
                 )
                 context.compoundQuestionnaire = compQuestionnaire
             }
+
         } catch {
+            viewState = .error(AnyLocalizedError(error: error, defaultErrorDescription: "Failed to create or update scheduled tasks."))
+        }
+        do {
+            try scheduler.createOrUpdateTask(
+                id: "six-minute-walk-test",
+                title: "Six Minute Walk Test",
+                instructions: "Please complete this task once a month.",
+                category: .measurement,
+                schedule: .daily(hour: 8, minute: 0, startingAt: .today)
+            )
+        }
+        catch {
             viewState = .error(AnyLocalizedError(error: error, defaultErrorDescription: "Failed to create or update scheduled tasks."))
         }
     }
 }
-
 
 extension Task.Context {
     @Property(coding: .json) var compoundQuestionnaire: CompoundQuestionnaire?

@@ -7,10 +7,23 @@
     "%@ Score" : {
 
     },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
 
     },
     "+1 (801) 587-1450" : {
+
+    },
+    "6MWT Results" : {
 
     },
     "ACCOUNT_SETUP_DESCRIPTION" : {
@@ -217,6 +230,9 @@
       }
     },
     "Date" : {
+
+    },
+    "Date: %@" : {
 
     },
     "Diagnosis" : {
@@ -697,10 +713,17 @@
         }
       }
     },
+    "Please complete this task once a month." : {
+
+    },
     "Please consult your doctor if you are unsure." : {
 
     },
+    "Please fill out the Social Support Questionnaire every 4 weeks." : {
+
+    },
     "Please fill out the Social Support Questionnaire every day." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

@@ -80,7 +80,7 @@ struct DataCard: View {
                 }
                 .onAppear {
                     Task {
-//                        await getSixMinuteWalkTestData()
+                        await getSixMinuteWalkTestData()
                     }
                 }
                 
@@ -158,7 +158,7 @@ struct DataCard: View {
                 await firestoreManager.loadSurveys()
                 getSurveyData(surveyType: "wiq")
             }else if title == "Six Minute Walk Test" {
-//                await getSixMinuteWalkTestData()
+                await getSixMinuteWalkTestData()
             }
             else if title == "Average Distance Traveled" {
                 await getAverageDistanceData()
@@ -194,25 +194,25 @@ struct DataCard: View {
         }
 
     // Gets the latest 6MWT session
-//    func getSixMinuteWalkTestData() async {
-//        // Initializing values to 0
-//        self.distance = 0.0
-//        self.steps = 0
-//        self.restCount = 0
-//        
-//        if let user = Auth.auth().currentUser {
-//            let userUID = user.uid
-//            await firestoreManager.getSixMinuteWalkTestResults(userUID: userUID)
-//            if let latestResult = firestoreManager.sixMinuteWalkTestResults.first {
-//                // Updating values if data exists
-//                self.distance = latestResult.distance
-//                self.steps = latestResult.steps
-//                self.restCount = latestResult.restCount
-//            }
-//        } else {
-//            print("User is not logged in.")
-//        }
-//    }
+    func getSixMinuteWalkTestData() async {
+        // Initializing values to 0
+        self.distance = 0.0
+        self.steps = 0
+        self.restCount = 0
+        
+        if let user = Auth.auth().currentUser {
+            let userUID = user.uid
+            await firestoreManager.getSixMinuteWalkTestResults(userUID: userUID)
+            if let latestResult = firestoreManager.sixMinuteWalkTestResults.first {
+                // Updating values if data exists
+                self.distance = latestResult.distance
+                self.steps = latestResult.steps
+                self.restCount = latestResult.restCount
+            }
+        } else {
+            print("User is not logged in.")
+        }
+    }
 
     
     // sums up all data points from each day
