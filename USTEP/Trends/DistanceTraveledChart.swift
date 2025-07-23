@@ -26,7 +26,7 @@ struct DistanceTraveledChart: View {
                         .annotation(position: .top) {
                             Text("\(datum.distance, specifier: "%.2f")")
                                 .font(.caption)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                         }
                     }
                 }
@@ -40,7 +40,7 @@ struct DistanceTraveledChart: View {
                             if let dateValue = value.as(String.self) {
                                 Text(dateValue)
                                     .font(.caption)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                             }
                         }
                     }

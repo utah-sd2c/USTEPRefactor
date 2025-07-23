@@ -24,7 +24,7 @@ struct MenuButton: View {
                 Text(buttonLabel)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(backgroundColor)
+                    .background(Color(.systemBackground))
                     .foregroundColor(foregroundColor)
                     .cornerRadius(10)
                     .overlay(
@@ -35,8 +35,8 @@ struct MenuButton: View {
                 Text(buttonLabel)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(backgroundColor)
-                    .foregroundColor(foregroundColor)
+                    .background(Color(.systemBackground))
+                    .foregroundColor(.primary)
                     .cornerRadius(10)
             }
         }
