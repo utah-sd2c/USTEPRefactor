@@ -33,13 +33,124 @@ struct DataCard: View {
     @State private var averageSteps: Double = 0.0
     
 
+//    var body: some View {
+//        VStack(alignment: .center) {
+//            // title
+//            HStack(alignment: .firstTextBaseline) {
+//                Image(systemName: icon)
+//                Text(title)
+//                    .font(.headline)
+//            }
+//            .padding(.bottom, 2)
+//            // data
+//            
+//            if title == "Six Minute Walk Test" {
+//                VStack {
+//                    HStack(alignment: .firstTextBaseline) {
+//                        Spacer()
+//                        VStack {
+//                            Text(String(format: "%.2f", convertToMiles(meters: distance)))
+//                                .font(.largeTitle)
+//                                .fontWeight(.bold)
+//                                .foregroundColor(color)
+//                                .accessibility(identifier: "\(unit)_val")
+//                            Text(unit)
+//                        }
+//                        Spacer()
+//                        VStack {
+//                            Text("\(steps)")
+//                                .font(.largeTitle)
+//                                .fontWeight(.bold)
+//                                .foregroundColor(color)
+//                                .accessibility(identifier: "steps_val")
+//                            Text("steps")
+//                        }
+//                        Spacer()
+//                        VStack {
+//                            Text("\(restCount)")
+//                                .font(.largeTitle)
+//                                .fontWeight(.bold)
+//                                .foregroundColor(color)
+//                                .accessibility(identifier: "rest_val")
+//                            Text("rests")
+//                        }
+//                        Spacer()
+//                        Image(systemName: "chevron.up")
+//                    }
+//                }
+//                .onAppear {
+//                    Task {
+//                        await getSixMinuteWalkTestData()
+//                    }
+//                }
+//                
+//            } else if title == "Average Distance Traveled" {
+//                HStack(alignment: .firstTextBaseline) {
+//                    Spacer()
+//                    Text(String(format: "%.2f", averageDistance))
+//                        .font(.largeTitle)
+//                        .fontWeight(.bold)
+//                        .foregroundColor(color)
+//                        .accessibility(identifier: "\(unit)_val")
+//                    Text("miles") // Change "mi" to "miles"
+//                    Spacer()
+//                    Image(systemName: "chevron.up")
+//                }
+//            
+//                .onAppear {
+//                    Task {
+//                        await getAverageDistanceData()
+//                    }
+//                }
+//        }
+//            else if title == "Average Step Count" {
+//                HStack(alignment: .firstTextBaseline) {
+//                    Spacer()
+//                    Text(String(format: "%.0f", averageSteps))
+//                        .font(.largeTitle)
+//                        .fontWeight(.bold)
+//                        .foregroundColor(color)
+//                        .accessibility(identifier: "\(unit)_val")
+//                    Text("steps")
+//                    Spacer()
+//                    Image(systemName: "chevron.up")
+//                }
+//                .onAppear {
+//                    Task {
+//                        await getAverageStepData()
+//                    }
+//                }
+//            }
+//                else {
+//                HStack(alignment: .firstTextBaseline) {
+//                    Spacer()
+//                    Text(Int(maxValue).description)
+//                        .font(.largeTitle)
+//                        .fontWeight(.bold)
+//                        .foregroundColor(color)
+//                        .accessibility(identifier: "\(unit)_val")
+//                    Text(unit)
+//                    Spacer()
+//                    Image(systemName: "chevron.up")
+//                }
+//            }
+//        }
+//        .padding(30)
+//        .frame(width: 350, height: title == "Six Minute Walk Test" ? 130 : 110) // Adjust the height for the "Six Minute Walk Test"
+//        .background {
+//            RoundedRectangle(cornerRadius: 10)
+//                .foregroundColor(Color(.systemBackground))
+//                .shadow(radius: 5)
+//        }
     var body: some View {
         VStack(alignment: .center) {
             // title
             HStack(alignment: .firstTextBaseline) {
                 Image(systemName: icon)
+                    .foregroundColor(.primary)
                 Text(title)
                     .font(.headline)
+                    .foregroundColor(.primary) 
             }
             .padding(.bottom, 2)
             // data
@@ -55,6 +166,7 @@ struct DataCard: View {
                                 .foregroundColor(color)
                                 .accessibility(identifier: "\(unit)_val")
                             Text(unit)
+                                .foregroundColor(.secondary)
                         }
                         Spacer()
                         VStack {
@@ -64,6 +176,7 @@ struct DataCard: View {
                                 .foregroundColor(color)
                                 .accessibility(identifier: "steps_val")
                             Text("steps")
+                                .foregroundColor(.secondary)
                         }
                         Spacer()
                         VStack {
@@ -73,9 +186,11 @@ struct DataCard: View {
                                 .foregroundColor(color)
                                 .accessibility(identifier: "rest_val")
                             Text("rests")
+                                .foregroundColor(.secondary)
                         }
                         Spacer()
                         Image(systemName: "chevron.up")
+                            .foregroundColor(.secondary)
                     }
                 }
                 .onAppear {
@@ -92,9 +207,11 @@ struct DataCard: View {
                         .fontWeight(.bold)
                         .foregroundColor(color)
                         .accessibility(identifier: "\(unit)_val")
-                    Text("miles") // Change "mi" to "miles"
+                    Text("miles")
+                        .foregroundColor(.secondary)
                     Spacer()
                     Image(systemName: "chevron.up")
+                        .foregroundColor(.secondary)
                 }
             
                 .onAppear {
@@ -112,8 +229,10 @@ struct DataCard: View {
                         .foregroundColor(color)
                         .accessibility(identifier: "\(unit)_val")
                     Text("steps")
+                        .foregroundColor(.secondary)
                     Spacer()
                     Image(systemName: "chevron.up")
+                        .foregroundColor(.secondary)
                 }
                 .onAppear {
                     Task {
@@ -130,17 +249,23 @@ struct DataCard: View {
                         .foregroundColor(color)
                         .accessibility(identifier: "\(unit)_val")
                     Text(unit)
+                        .foregroundColor(.secondary)
                     Spacer()
                     Image(systemName: "chevron.up")
+                        .foregroundColor(.secondary)
                 }
             }
         }
         .padding(30)
-        .frame(width: 350, height: title == "Six Minute Walk Test" ? 130 : 110) // Adjust the height for the "Six Minute Walk Test"
+        .frame(width: 350, height: title == "Six Minute Walk Test" ? 130 : 110)
         .background {
             RoundedRectangle(cornerRadius: 10)
-                .foregroundColor(Color(.systemBackground))
-                .shadow(radius: 5)
+                .fill(Color(.tertiarySystemBackground))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color(.separator).opacity(0.3), lineWidth: 0.5) 
+                )
+                .shadow(color: .primary.opacity(0.1), radius: 5) 
         }
         .task {
             if title == "Average Step Count" {

@@ -27,7 +27,7 @@ struct StepCountChartnew: View {
                         .annotation(position: .top) {
                             Text("\(datum.steps)")
                                 .font(.caption)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                         }
                     }
                 }
@@ -41,7 +41,7 @@ struct StepCountChartnew: View {
                             if let dateValue = value.as(String.self) {
                                 Text(dateValue)
                                     .font(.caption)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                             }
                         }
                     }
